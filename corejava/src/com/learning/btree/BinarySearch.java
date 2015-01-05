@@ -5,12 +5,13 @@ public class BinarySearch {
 	public static boolean binarySearch(int[] arr, int l, int r, int toFind) {
 		if (l < r) {
 			int mid = (l+r)/2;
-			if(toFind < arr[mid]) {
-				return binarySearch(arr, l, mid, toFind);
-			} else if(toFind > arr[mid]) {
-				return binarySearch(arr, mid + 1, r, toFind);
-			} else {
+			if(arr[mid] == toFind) {
 				return true;
+			}
+			else if(toFind < arr[mid]) {
+				return binarySearch(arr, l, mid, toFind);
+			} else {
+				return binarySearch(arr, mid + 1, r, toFind);
 			}
 		}
 		return false;
@@ -36,7 +37,7 @@ public class BinarySearch {
 	public static void main(String[] args) {
 		int[] iArray = {1,2,4,5,6,9,13,18,21,25,28,29,33,34,37,49};
 		//int[] iArray = {1,2};
-		boolean isThere = binarySearch(iArray, 0, iArray.length, 21);
+		boolean isThere = binarySearch(iArray, 0, iArray.length - 1, 1);
 		System.out.println("isthr "+isThere);
 		isThere = binarySearchFunctional(iArray, 49);
 		System.out.println("isthr "+isThere);		

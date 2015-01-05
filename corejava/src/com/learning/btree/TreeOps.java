@@ -77,16 +77,17 @@ public class TreeOps {
 		return in;
 	}
 	
-	public static String prettyPrint (Node n, ObjectCounter ai, StringBuilder sb) {
+	public static StringBuilder prettyPrint (Node n, ObjectCounter ai, StringBuilder sb) {
 		if ( n != null ) {
 			for (int ct = 0; ct < ai.getCount(); ct++) {
 				sb.append(" ");
 			}
 			sb.append(n.data);
-			prettyPrint(n.left, ai.setCount(ai.getCount() - 1), sb.append("\n"));
-			prettyPrint(n.right, ai.setCount(ai.getCount() + 2), sb);
+			sb = prettyPrint(n.left, ai.setCount(ai.getCount() - 1), sb.append("\n"));
+			//sb.deleteCharAt(sb.length()-1);
+			sb = prettyPrint(n.right, ai.setCount(ai.getCount() + 2), sb);
 		}	
-		return sb.toString();
+		return sb;
 	}
 	
 	public static int findMaxHeight(Node n) {
@@ -101,15 +102,15 @@ public class TreeOps {
 	public static void main(String[] args) {
 		TreeOps.createRoot(45);
 		TreeOps.insertNode(root, 48);
-		TreeOps.insertNode(root, 50);
-		TreeOps.insertNode(root, 20);
-		TreeOps.insertNode(root, 35);
-		TreeOps.insertNode(root, 55);
-		TreeOps.insertNode(root, 23);
-		TreeOps.insertNode(root, 49);
-		TreeOps.insertNode(root, 13);
-		TreeOps.insertNode(root, 8);
-		System.out.println(TreeOps.prettyPrint(root, new ObjectCounter(10), new StringBuilder()));
+		TreeOps.insertNode(root, 43);
+//		TreeOps.insertNode(root, 20);
+//		TreeOps.insertNode(root, 35);
+//		TreeOps.insertNode(root, 55);
+//		TreeOps.insertNode(root, 23);
+//		TreeOps.insertNode(root, 49);
+//		TreeOps.insertNode(root, 13);
+//		TreeOps.insertNode(root, 8);
+		System.out.println(TreeOps.prettyPrint(root, new ObjectCounter(findMaxHeight(root)*5), new StringBuilder()));
 		//postorderWalk(root);
 		System.out.println("Max height "+findMaxHeight(root));
 		
@@ -118,10 +119,10 @@ public class TreeOps {
 		int mid = (left+right)/2;
 		left = mid; right = mid;
 		TreeOps.createRoot(inputNodes[mid]);
-		/*while (left > 0 && right < inputNodes.length) {
-			TreeOps.insertNode(root, inputNodes[left--]);	
-			TreeOps.insertNode(root, inputNodes[right++]);	
-		}*/
+//		while (left > 0 && right < inputNodes.length) {
+//			TreeOps.insertNode(root, inputNodes[left--]);	
+//			TreeOps.insertNode(root, inputNodes[right++]);	
+//		}
 		TreeOps.insertBalancedNode2(root, Integer.MIN_VALUE);
 		TreeOps.insertBalancedNode2(root, Integer.MAX_VALUE);
 		System.out.println(TreeOps.prettyPrint(root, new ObjectCounter(20), new StringBuilder()));

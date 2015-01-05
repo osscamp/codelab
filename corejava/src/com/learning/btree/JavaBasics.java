@@ -1,5 +1,8 @@
 package com.learning.btree;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class JavaBasics {
 	
 	public static String reverseString(String str) {
@@ -77,34 +80,6 @@ public class JavaBasics {
 		return sum;
 	}
 	
-	public static boolean isPalindromeInt(int number) {
-		if(number > -10 && number < 10) {
-			return true;
-		}
-		int divisor = 10;
-		int remainder = 0;
-		int quotient = number;
-		int palindrome = 0;
-		while(quotient>=10){
-			remainder = number%divisor;
-			quotient = number/divisor;
-			divisor*=10;
-		}
-		divisor/=10;
-		int mm = 1;
-		while(divisor>1){
-			palindrome+=quotient*mm;
-			mm*=10;
-			divisor/=10;
-			quotient=remainder/divisor;
-			remainder=remainder%divisor;
-		}
-		palindrome+=quotient*mm;
-		System.out.println(palindrome);
-
-		return palindrome == number;
-	}
-	
 	public static boolean isPalindrome2(int number) {
 		int reversed = 0;
 		int copy = number;
@@ -129,6 +104,31 @@ public class JavaBasics {
 			System.out.println(sb.toString());
 		}
 	}
+	
+	public static Set<String> permuteString(String input) {
+	    Set<String> set = new HashSet<String>();
+	    if (input == "")
+	        return set;
+	    Character a = input.charAt(0);
+	    if (input.length() > 1)
+	    {
+	        input = input.substring(1);
+	        Set<String> permSet = permuteString(input);
+	        for (String x : permSet)
+	        {
+	            for (int i = 0; i <= x.length(); i++)
+	            {
+	                set.add(x.substring(0, i) + a + x.substring(i));
+	            }
+	        }
+	    }
+	    else
+	    {
+	        set.add(a + "");
+	    }
+	    return set;
+
+	}
 
 	public static void main(String[] args) {
 		System.out.println(reverseByArray("valet"));
@@ -138,7 +138,6 @@ public class JavaBasics {
 		System.out.println(fibonacciR(8));
 		reverseWords("a new cent");
 		System.out.println("sum="+findHarmonicSum(10));
-		System.out.println(isPalindromeInt(1234321));
 		System.out.println(isPalindrome2(532235));
 		replaceSpaces("space string");
 		printTriangle(4);
