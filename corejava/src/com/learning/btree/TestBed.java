@@ -183,6 +183,61 @@ public class TestBed {
 		System.out.println(sdata);
 	}
 	
+	public static boolean isSumPresent(int[] a, int sum) {
+		int lp = 0;
+		int rp = a.length - 1;
+		int rs = 0;
+		while(lp < rp) {
+			rs = a[lp] + a[rp];
+			if(rs < sum) {
+				lp++;
+			} else if (rs > sum) {
+				rp--;				
+			} else {
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	
+	public static boolean isThreeSum0(int[] a) {
+		if(a == null) {
+			return false;
+		}
+		Arrays.sort(a);
+		int nn = 0;
+		for(nn=0; nn<a.length - 2 && a[nn] < 0; nn++) {
+			int one = a[nn];
+			if(one > 0) return false;
+			int img = -1*one;
+			if(isSumPresent(a, img)) {
+				return true;
+			}
+		}
+		if(a[nn] == 0 && nn+2 < a.length &&(a[nn] == 0 && a[nn+1] == 0 && a[nn+2]==0)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static int findMaxDiff(int[] a) {
+		int max = Integer.MIN_VALUE;
+		int maxdiff = Integer.MIN_VALUE;
+		for(int i=a.length - 1; i>=0; i--) {
+			if(a[i] > max) {
+				max = a[i];
+			}
+			else {
+				int diff = max - a[i];
+				if(diff > maxdiff) {
+					maxdiff = diff;
+				}
+			}
+		}
+		return maxdiff;
+	}
+	
 	public static void main(String[] args) {
 		int[] arr = {4,2,9,7,1,3,8,12,6};
 		//int[] arr = {5,4,5};
@@ -199,6 +254,9 @@ public class TestBed {
 		String str = "We are students";
 		char[] del = {'a', 'e', 'i', 'o', 'u'};
 		deleteChars(str, del);
+		System.out.println(isSumPresent(new int[] {1,2,3,5,7}, 14));
+		System.out.println(isThreeSum0(new int[] {-1,0,1}));
+		System.out.println(findMaxDiff(new int[]{9, 11, 5, 7, 16, 1, 4, 2}));
 	}
 
 }

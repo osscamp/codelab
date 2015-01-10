@@ -93,10 +93,8 @@ public class TestTree {
 		List<Node> nextLevel = new ArrayList<Node>();
 		currentLevel.add(root);
 		while(!currentLevel.isEmpty()) {
-			Iterator<Node> itr = currentLevel.iterator();
 			StringBuilder sb = new StringBuilder();
-			while(itr.hasNext()) {
-				Node currentNode = itr.next();
+			for(Node currentNode : currentLevel) {
 				if(currentNode.left != null) {
 					nextLevel.add(currentNode.left);
 				}

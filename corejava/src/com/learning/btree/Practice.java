@@ -8,6 +8,8 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.learning.btree.TestTree.Node;
+
 public class Practice {
 
 	Node root;
@@ -156,16 +158,19 @@ public class Practice {
 		return n.d;
 	}
 	
+	public Node findMin(Node n) {
+		if (n.left != null) {
+			return findMin(n.left);
+		} 
+		return n;
+	}
+	
 	public Node findSuccessor(Node n) {
 		if(n == null) {
 			return n;
 		}
 		if(n.right != null) {
-			n = n.right;
-			while(n.left != null) {
-				n = n.left;
-			}
-			return n;
+			return findMin(n.right);
 		}
 		Node up = n.parent;
 		while(up != null && n == up.right) {
@@ -173,6 +178,29 @@ public class Practice {
 			up = up.parent;
 		}
 		return up;
+	}
+	
+	
+	public Node findSuccessorNoParent(Node n) {
+		if(n == null) {
+			return n;
+		}
+		if ( n.right != null ) {
+			return findMin(n.right);
+		}
+		Node nn = root;
+		Node succ = nn;
+		while(nn != null) {
+			if(n.d < nn.d) {
+				succ = nn;
+				nn = nn.left;
+			} else if(n.d > nn.d) {
+				nn = nn.right;
+			} else {
+				break;
+			}
+		}
+		return succ;
 	}
 	
 	public void leftRotate(Node n) {
@@ -246,6 +274,45 @@ public class Practice {
 			printPaths(n.right);
 		}
 	}
+	
+	public boolean hasPathSum(Node n, int targetSum) {
+		if(n != null) {
+			if(n.left == null && n.right == null) { // found a leaf node, go up the tree
+				int pathSum = 0;
+				pathSum += n.d;
+				Node p = n.parent;
+				while(p != null) {
+					pathSum += p.d;
+					p = p.parent;
+				}
+				System.out.println(pathSum);
+				if(pathSum == targetSum) {
+					System.out.println("found path with sum : "+targetSum);
+					return true;
+				}
+			}
+			return hasPathSum(n.left, targetSum) ||
+						hasPathSum(n.right, targetSum);			
+		}
+		return false;
+	}
+	
+	public void printTopView(Node n) {
+		Node t = n;
+		StringBuilder sb = new StringBuilder();
+		while (t != null) {
+			sb.insert(0, t).insert(1, " ");
+			t=t.left;
+		} 
+		t = n;
+		while(t != null) {
+			t= t.right;
+			if(t != null) {
+				sb.append(t).append(" ");
+			}
+		}
+		System.out.println(sb);
+	}
 
 	public static void main(String[] args) {
 		Practice practice = new Practice();
@@ -260,6 +327,9 @@ public class Practice {
 		practice.insertTreeNode(10);
 		//practice.insertTreeNode(14);
 		practice.insertTreeNode(28);
+		practice.insertTreeNode(25);
+		practice.insertTreeNode(38);
+		practice.insertTreeNode(29);
 		practice.inOrderPrint(practice.root);
 		int ht = practice.heightR(practice.root);
 
@@ -281,6 +351,10 @@ public class Practice {
 		practice.isFull(practice.root, bb);
 		System.out.println("is full "+bb.get());
 		practice.printPaths();
+		practice.hasPathSum(practice.root, 18);
+		System.out.println(practice.findSuccessor(practice.root.right.left.left));
+		System.out.println(practice.findSuccessorNoParent(practice.root.right.left.left));
+		practice.printTopView(practice.root);
 	}
 
 }
