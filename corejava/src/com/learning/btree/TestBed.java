@@ -165,8 +165,29 @@ public class TestBed {
 			aux[kk] = min;
 		}
 		for(int jj : aux) {
-			System.out.println(jj);
+			System.out.println("least k "+jj);
 		}
+	}
+	
+	//partition the array at end , if pivot == k, kth is found
+	public static void findKthLargest(int[] a, int k) {
+		int len = a.length;
+		int pivot = a[len - 1];
+		int i = 0;
+		int j = i+1;
+		while(i < len && j < len) {
+			if(a[j] < pivot) {
+				int tmp = a[j];
+				a[j] = a[i];
+				a[i] = tmp;
+				i++;
+			}
+			j++;
+		}
+		int tmp = a[i];
+		a[i] = pivot;
+		a[len - 1] = tmp;
+		System.out.println("pivot pos "+i);
 	}
 	
 	public static void deleteChars(String data, char[] del) {
@@ -248,7 +269,7 @@ public class TestBed {
 		power(2, 5);
 		printSeries(6);
 		printSeries2(6);
-		//partitionArray(arr);
+		partitionArray(arr);
 		print(arr);
 		findLeastk(5, arr);
 		String str = "We are students";
@@ -257,6 +278,7 @@ public class TestBed {
 		System.out.println(isSumPresent(new int[] {1,2,3,5,7}, 14));
 		System.out.println(isThreeSum0(new int[] {-1,0,1}));
 		System.out.println(findMaxDiff(new int[]{9, 11, 5, 7, 16, 1, 4, 2}));
+		findKthLargest(new int[]{9, 11, 5, 7, 16, 1, 4, 8}, 6);
 	}
 
 }

@@ -1,6 +1,19 @@
 package com.learning.btree;
 
 public class Sort {
+		
+	public static void bubbleSort(int[] a) {
+		int length = a.length;
+		for(int i=0; i<length; i++) {
+			for(int j=i; j<length; j++) {
+				if(a[i] > a[j]) {
+					int tmp = a[j];
+					a[j] = a[i];
+					a[i] = tmp;
+				}
+			}
+		}
+	}
 
 	public static void insertionSort(int[] a) {
 		for (int j = 1; j < a.length; j++) {
@@ -15,6 +28,7 @@ public class Sort {
 		for (int n : a) {
 			System.out.println(n);
 		}
+
 	}
 	
 	public static void insertionSort1(int[] a) {
@@ -128,13 +142,56 @@ public class Sort {
 		}
 
 	}
+	
+	public static void heapsort(int[] a) {
+		buildMaxHeap(a);
+		int N = a.length-1;
+		for(int i=N; i>0; i--) {
+			exch(a, 0, i);
+			N--;
+			maxHeapify(a, 0);
+		}
+
+	}
+	
+	public static void exch(int[] b, int o, int e) {
+		int tmp = b[e];
+		b[e] = b[o];
+		b[o] = tmp;
+	}
+	
+	public static void buildMaxHeap(int[] a) {
+		int N = a.length;
+		for(int i=N/2; i>=0; i--) {
+			maxHeapify(a, i);
+		}
+	}
+	
+	public static void maxHeapify(int[] a, int i) {
+		int l = 2*i;
+		int r = 2*i + 1;
+		int largest = 0;
+		if( l < a.length && a[l] > a[i]) {
+			largest = l;
+		} else { largest = i; }
+		if( r < a.length && a[r] > a[largest]) {
+			largest = r;
+		} 
+		if(largest != i) {
+			exch(a, i, largest);
+			maxHeapify(a, largest);
+		}
+	}
 
 	public static void main(String[] args) {
 		int[] arr = { 5, 1, 20, 34, 2, 8, 212, 145, 38, 75, 21 };
 		//int[] arr = { 5, 1, 20, 34, 8 };
-		// insertionSort(arr);
-		mergeSort(arr, 0, arr.length - 1);
+		//insertionSort(arr);
+		//mergeSort(arr, 0, arr.length - 1);
 		//quickSort(arr, 0, arr.length -1 );
+		heapsort(arr);
+		//bubbleSort(arr);
+		//buildMaxHeap(arr);
 		for (int n : arr) {
 			System.out.println(n);
 		}

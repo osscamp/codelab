@@ -31,14 +31,6 @@ public class TreeOps {
 		}
 	}
 	
-	public static void postorderWalk( Node n ) {
-		if ( n != null ) {
-			postorderWalk(n.right);
-			System.out.println(n.data);
-			postorderWalk(n.left);
-		}
-	}
-	
 	public static int getTotal(Node n) {
 		if (n != null) {
 			total += n.data;

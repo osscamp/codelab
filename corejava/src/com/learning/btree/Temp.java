@@ -80,13 +80,13 @@ public class Temp {
 	}
 	
 	public static boolean binSearch(int[] a, int val, int left, int right) {
-		if(left < right) {
-			int mid = (left + right) / 2;
+		if(left <= right) {
+			int mid = left + (right-left)/2;
 			if(val == a[mid]) {
 				return true;
 			}
 			else if(val < a[mid]) {
-				return binSearch(a, val, left, mid - 1);
+				return binSearch(a, val, left, mid-1);
 			} else  {
 				return binSearch(a, val, mid+1, right);
 			}
@@ -95,17 +95,19 @@ public class Temp {
 	}
 	
 	public static void main(String[] args) {
-		int[] a1 = new int[100];
-		for(int i = 0; i<100; i++) {
-			a1[i] = (int)(Math.random()*100.0);
+		int N = 15;
+		int[] a1 = new int[N];
+		Random rm = new Random();
+		for(int i = 0; i<N; i++) {
+			a1[i] = rm.nextInt(N)+1;
 		}
-		insertionSort(a1);
+//		insertionSort(a1);
 		mergeSort(a1, 0, a1.length-1);
-		for (int j2 = 0; j2 < a1.length; j2++) {
+/*		for (int j2 = 0; j2 < a1.length; j2++) {
 			System.out.println(a1[j2]);
-		}
+		}*/
 		int[] a2 = {1,2,4,5,6,7};
-		System.out.println(binSearch(a2, 3, 0, a2.length-1));
+		System.out.println(binSearch(a2, 7, 0, a2.length-1));
 		randomizeArray(a2);
 	}
 

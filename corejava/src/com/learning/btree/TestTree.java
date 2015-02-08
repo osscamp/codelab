@@ -57,6 +57,23 @@ public class TestTree {
 		}
 		return t;
 	}
+	
+	public Node searchNode(int x) {
+		return searchNode(root, x);
+	}
+	
+	public Node searchNode(Node p, int x) {
+		if(p == null) {
+			return null;
+		}
+		if(x < p.v) {
+			return searchNode(p.left, x);
+		}else if(x > p.v) {
+			return searchNode(p.right, x);
+		}else {
+			return p;
+		}
+	}
 
 	public void inOrderPrint(Node n) {
 		if (n != null) {
@@ -66,11 +83,11 @@ public class TestTree {
 		}
 	}
 	
-	public void preOrderPrint(Node n) {
+	public void postOrderPrint(Node n) {
 		if (n != null) {
+			postOrderPrint(n.left);
+			postOrderPrint(n.right);
 			System.out.println(n.v);
-			preOrderPrint(n.left);
-			preOrderPrint(n.right);
 		}
 	}
 	
@@ -124,6 +141,7 @@ public class TestTree {
 			int heightR = heightR(n.right);
 			if(Math.abs(heightL-heightR) > 1) {
 				b.set(false);
+				return;
 			}
 		}
 		System.out.println(b.get());
@@ -229,7 +247,8 @@ public class TestTree {
 		if (vd < n.v) {
 			n.left = delete(n.left, vd);
 		} else if (vd > n.v) {
-			n.right = delete(n.right, vd);
+			Node delR = delete(n.right, vd);
+			n.right = delR;
 		} else {
 			if (n.left == null) {
 				return n.right;
@@ -265,6 +284,26 @@ public class TestTree {
 			up = up.parent;
 		}
 		return up;
+	}
+	
+	public Node findSuccessorWithoutParent(int x) {
+		Node nn = searchNode(x);
+		if(nn.right != null) {
+			return findMinNode(nn.right);
+		}
+		return findSuccessorR(root, nn, null);
+	}
+	
+	public Node findSuccessorR(Node n, Node x, Node p) {
+		if(n == x) {
+			return p;
+		}
+		if(x.v < n.v) {
+			return findSuccessorR(n.left, x, n);
+		} else  {
+			return findSuccessorR(n.right, x, p);
+		}
+		//return p;
 	}
 	
 	public void leftRotate(Node n) {
@@ -314,6 +353,12 @@ public class TestTree {
 			p = p.left;
 		return p.v;
 	}
+	
+	private Node findMinNode(Node p) {
+		while (p.left != null)
+			p = p.left;
+		return p;
+	}
 
 	public static void main(String[] args) {
 		Node tn = new Node(15);
@@ -356,6 +401,18 @@ public class TestTree {
 		tt.insertNode(tt.root, 29);
 		tt.isBalanced(tt.root, new AtomicBoolean(true));
 		tt.prettyPrintSO();
+		Node successor = tt.findSuccessorWithoutParent(16);
+		System.out.println("suc "+successor);
+		tt.postOrderPrint(tt.root);
+		
+		Node ttn = new Node(151);
+		TestTree ttt = new TestTree();
+		ttt.root = ttn;
+		ttt.insertNode(ttt.root, 25);
+		ttt.insertNode(ttt.root, 512);
+		ttt.insertNode(ttt.root, 280);
+		ttt.insertNode(ttt.root, 780);
+		ttt.delete(ttt.root, 151);
 	}
 
 }
