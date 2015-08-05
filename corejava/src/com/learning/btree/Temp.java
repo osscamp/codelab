@@ -62,23 +62,6 @@ public class Temp {
 
 	}
 	
-	public static void randomizeArray(int[] a) {
-		int len = a.length;
-		int rnd = 0;
-		Random rn = new Random();
-
-		for(int i=0; i<len; i++) {
-			//rnd = rn.nextInt(len - i) + i;
-			rnd = rn.nextInt(len);
-			int tmp = a[rnd];
-			a[rnd] = a[i];
-			a[i] = tmp;
-		}
-		for(int aa: a) {
-			System.out.println(aa);
-		}
-	}
-	
 	public static boolean binSearch(int[] a, int val, int left, int right) {
 		if(left <= right) {
 			int mid = left + (right-left)/2;
@@ -108,7 +91,6 @@ public class Temp {
 		}*/
 		int[] a2 = {1,2,4,5,6,7};
 		System.out.println(binSearch(a2, 7, 0, a2.length-1));
-		randomizeArray(a2);
 	}
 
 }

@@ -1,11 +1,15 @@
 package com.learning.btree;
 
+import java.util.Arrays;
+
 public class Sort {
 		
 	public static void bubbleSort(int[] a) {
 		int length = a.length;
+		int invoc = 0;
 		for(int i=0; i<length; i++) {
 			for(int j=i; j<length; j++) {
+				invoc++;
 				if(a[i] > a[j]) {
 					int tmp = a[j];
 					a[j] = a[i];
@@ -13,43 +17,25 @@ public class Sort {
 				}
 			}
 		}
-	}
-
-	public static void insertionSort(int[] a) {
-		for (int j = 1; j < a.length; j++) {
-			int k = a[j];
-			int i = j - 1;
-			while (i >= 0 && a[i] > k) {
-				a[i + 1] = a[i];
-				i--;
-				a[i + 1] = k;
-			}
-		}
-		for (int n : a) {
-			System.out.println(n);
-		}
-
+		System.out.println("invoc "+invoc);
 	}
 	
-	public static void insertionSort1(int[] a) {
-		for(int i=0; i<a.length-1; i++) {
-			int j = i+1;
-			int k = i;
-			while(a[j] < a[k]) {
+	public static void insertionSort(int[] a) {
+		int invoc = 0;
+		for(int i=1; i<a.length; i++) {
+			int j = i;
+			while(j > 0 && a[j] < a[j-1]) {
+				invoc++;
 				int tmp = a[j];
-				a[j] = a[k];
-				a[k] = tmp;
+				a[j] = a[j-1];
+				a[j-1] = tmp;
 				j--;
-				if(k == 0) break;
-				k--;
-
 			}
 		}
-		for(int aa : a) {
-			System.out.println(aa);
-		}
+		System.out.println("invoc "+invoc);
 		
 	}
+
 	
 	public static void quickSort(int[] a, int l, int r) {
 		if(l < r) {
@@ -62,33 +48,33 @@ public class Sort {
 	
 	public static int partition(int[] a, int l, int r) {
 		int x = a[r];
-		int i = l;
-		for(int j=l; j<r; j++) {
-			if(a[j] <= x) {				
+		int j = l;
+		for(int i=l; i<r; i++) {
+			if(a[i] < x) {				
 				int tmp = a[i];
 				a[i] = a[j];
 				a[j] = tmp;
-				i++;
+				j++;
 			}
 		}
-		int tmp = a[i];
-		a[i] = a[r];
+		int tmp = a[j];
+		a[j] = a[r];
 		a[r] = tmp;
-		return i;
+		return j;
 	}
 
 	public static void mergeSort(int[] a, int l, int r) {
 		if (l < r) {
 			int m = (l + r) / 2;
-			mergeSort(a, l, m);
 			mergeSort(a, m + 1, r);
+			mergeSort(a, l, m);
 			merge0(a, l, m, r);
 		}
 
 	}
 
 	public static void merge(int[] a, int l, int m, int r) {
-		int[] helper = new int[a.length];
+		int[] helper = new int[r+1];
 
 		for (int i = 0; i <= r; i++) {
 			helper[i] = a[i];
@@ -143,57 +129,200 @@ public class Sort {
 
 	}
 	
-	public static void heapsort(int[] a) {
-		buildMaxHeap(a);
-		int N = a.length-1;
-		for(int i=N; i>0; i--) {
-			exch(a, 0, i);
-			N--;
-			maxHeapify(a, 0);
+	//partition the array at end , if pivot == k, kth is found
+	public static int findKthLargest(int[] a, int k) {
+		return findKthLargest(a, a.length-k, 0, a.length);
+	}
+	public static int findKthLargest(int[] a, int k, int l, int r) {
+		int pivot = -1;
+		if(l<r) {
+			pivot = kthPartition(a, l, r);
+			if(pivot == k) {
+				return a[pivot];
+			}
+			if(k < pivot) {
+				return findKthLargest(a, k, l, pivot);
+			} else {
+				return findKthLargest(a, k, pivot + 1, r);
+			}
 		}
+		if(l == r && l<a.length) {
+			return a[l];
+		}
+		return pivot;
+	}
+	
+	public static int kthPartition(int[] a, int l, int r) {
+		//int len = a.length;
+		int pivot = a[r - 1];
+		int i = l;
+		for(int j=i; j<r; j++) {
+			if(a[j] < pivot) {
+				int tmp = a[j];
+				a[j] = a[i];
+				a[i] = tmp;
+				i++;
+			}
+			//j++;
+		}
+		int tmp = a[i];
+		a[i] = pivot;
+		a[r - 1] = tmp;
+		System.out.println("pivot pos "+i);
+		return i;
+	}
 
-	}
 	
-	public static void exch(int[] b, int o, int e) {
-		int tmp = b[e];
-		b[e] = b[o];
-		b[o] = tmp;
-	}
-	
-	public static void buildMaxHeap(int[] a) {
-		int N = a.length;
-		for(int i=N/2; i>=0; i--) {
-			maxHeapify(a, i);
+	public static void countSort() {
+		int k = 9;
+		int[] a = {1,2,2,8,5,2,1,5,4,8,3,2,2,5,1};
+		int[] aux = new int[k];
+		int[] sorted = new int[a.length];
+		MaxHeap.printArray(a);
+		for(int i=0; i<a.length; i++) {
+			aux[a[i]]++;
 		}
-	}
-	
-	public static void maxHeapify(int[] a, int i) {
-		int l = 2*i;
-		int r = 2*i + 1;
-		int largest = 0;
-		if( l < a.length && a[l] > a[i]) {
-			largest = l;
-		} else { largest = i; }
-		if( r < a.length && a[r] > a[largest]) {
-			largest = r;
-		} 
-		if(largest != i) {
-			exch(a, i, largest);
-			maxHeapify(a, largest);
-		}
-	}
+		MaxHeap.printArray(aux);
 
+		for(int i=1; i<aux.length; i++) {
+			aux[i] = aux[i] + aux[i-1];
+		}
+		MaxHeap.printArray(aux);
+
+		for(int i=a.length-1; i>=0; i--) {
+			//int ai = a[i];
+			//int auxai = aux[ai];
+			sorted[--aux[a[i]]] = a[i];
+			MaxHeap.printArray(sorted);
+			//aux[a[i]] = aux[a[i]] - 1;
+		}
+		for(int i=0; i<sorted.length; i++) {
+			//System.out.println("nn "+sorted[i]);
+		}
+		
+	}
+	
+	public static void sort3values() {
+		char[] a = "bbgbrr".toCharArray();
+		int ctr = 0;
+		int ridx = getRidx(a, 0);
+		int bidx = getBidx(a, a.length - 1);
+		boolean ismodified = false;
+		while(ctr <= bidx && ridx < bidx) {
+			if(a[ctr] == 'r' && ridx < ctr) {
+				char tmp = a[ctr];
+				a[ctr] = a[ridx];
+				a[ridx] = tmp;
+				ridx = getRidx(a, ridx);
+				bidx = getBidx(a, bidx);
+			} else if(a[ctr] == 'b'){
+				char tmp = a[ctr];
+				a[ctr] = a[bidx];
+				a[bidx] = tmp;
+				bidx = getBidx(a, bidx);
+				ridx = getRidx(a, ridx);
+				ismodified = true;
+			}
+			if(ctr > 0 && a[ctr] == 'r' && ismodified) {
+				ismodified = false;
+				continue;
+			}
+			ctr++;
+		}
+		System.out.println(new String(a));
+	}
+	
+	static int getRidx(char[] a, int start) {
+		int i = start;
+		while(i<a.length - 1 && a[i] == 'r') { i++; }
+		return i;
+	}
+	
+	static int getBidx(char[] a, int end) {
+		int i = end;
+		while(i>0 && a[i] == 'b') { i--; }
+
+		return i;
+	}
+	
+	public static void sort3Values2()
+	{
+		int[] a = {1,0,2,1,0};
+		int lo = 0;
+		int mid = 0;
+		int hi = a.length-1;
+		while(mid < hi) {
+			if(a[mid] == 0) {
+				swap(a, lo, mid);
+				lo++;
+				mid++;
+			} else if(a[mid] == 1) {
+				mid++;
+			} else {
+				swap(a, mid, hi);
+				hi--;
+			}
+		}
+		MaxHeap.printArray(a);
+	}
+	
+	public static void swap(int[] a, int l, int r) {
+		int tmp = a[l];
+		a[l] = a[r];
+		a[r] = tmp;
+	}
+	
+	public static void sortStrings(String[] a) {
+		quickSortStr(a, 0, a.length-1);
+		for(String s:a)System.out.println(s);
+	}
+	
+	public static void quickSortStr(String[] a, int l, int r) {
+		if(l < r) {
+			int p = partition(a, l, r);
+			quickSortStr(a, l, p-1);
+			quickSortStr(a, p+1, r);
+		}
+	}
+	
+	public static int partition(String[] a, int l, int r) {
+		String pivot = a[r];
+		int i=l;
+		int j=i;
+		while(i < r) {
+			if(a[i].compareTo(pivot) < 0) {
+				String t = a[i];
+				a[i] = a[j];
+				a[j] = t;
+				j++;
+			}
+			i++;
+		}
+		String tmp = a[j];
+		a[j] = pivot;
+		a[r] = tmp;
+		return j;
+	}
+	
 	public static void main(String[] args) {
-		int[] arr = { 5, 1, 20, 34, 2, 8, 212, 145, 38, 75, 21 };
+		int[] arr = {12,20,15,29,23,17,22,21,40,26,51,19};
 		//int[] arr = { 5, 1, 20, 34, 8 };
-		//insertionSort(arr);
+		//bubbleSort(arr);
+		insertionSort(arr);
 		//mergeSort(arr, 0, arr.length - 1);
+		//ins(arr);
 		//quickSort(arr, 0, arr.length -1 );
-		heapsort(arr);
+		MaxHeap.printArray(arr);
 		//bubbleSort(arr);
 		//buildMaxHeap(arr);
-		for (int n : arr) {
-			System.out.println(n);
-		}
+		//heapsort(arr);
+
+		int value = findKthLargest(new int[]{9, 11, 5, 7, 16, 1, 4, 12}, 3);
+		System.out.println("kth largest "+value);
+		//insertionSort(arr);
+		countSort();
+		sort3values();
+		sort3Values2();
+		sortStrings(new String[]{"algo","galo","altus","sell", "belt"});
 	}
 }

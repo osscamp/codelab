@@ -2,14 +2,14 @@ package com.learning.btree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class MiscQ {
@@ -147,17 +147,29 @@ public class MiscQ {
 		}
 	}
 	
-	public void findAppts() {
-		int[][] a1 = {{1,5},{10,14},{19,20},{21,24},{27,30}};
-		int[][] a2 = {{3,5},{12,15},{18,21},{23,24}};
+	public void findFreeAppointments() {
+		int[][] a1 = {{1,5},{10,14},{19,20},{21,24}};
+		int[][] a2 = {{3,5},{12,15},{18,21},{23,24},{27,30}};
 		int l1 = a1.length;
-		for(int i=0; i<l1-1&&i<a2.length-1; i++) {
+		int l2 = a2.length;
+		for(int i=0; i<l1 - 1 || i<l2-1; i++) {
 			int end = Math.max(a1[i][1], a2[i][1]);
-			
-			int startnext = Math.min(a1[i+1][0], a2[i+1][0]);			
+			int a1m = 0;
+			int a2m = 0;
+			if(i+1 < l1) { 
+				a1m = a1[i+1][0]; 
+			} else {
+				a1m = a2[i+1][0]; 
+			}
+			if(i+1 < l2) { 
+				a2m = a2[i+1][0]; 
+			} else {
+				a2m = a1[i+1][0]; 
+			}
+			int startnext = Math.min(a1m, a2m);			
 			//int end1 = Math.max(a1[i+1][1], a2[i+1][1]);
 			
-			if(end == startnext)System.out.println("start "+end+" end "+startnext);
+			if(end == startnext)continue;
 			System.out.println("start "+(end+1)+" end "+(startnext-1));
 		}
 	}
@@ -233,6 +245,51 @@ public class MiscQ {
 		}		
 	}
 	
+	public boolean sumEx(int[] a, int v) {
+		int al = a.length;
+		Set<Integer> mmap = new HashSet<>();
+		for(int i=0; i<al; i++) {
+			int av = a[i];
+			if(mmap.contains(v-av)) {
+				return true;
+			}
+			mmap.add(av);
+		}
+		return false;
+	}
+	
+	public boolean sumExSorted(int[] a, int v) {
+		int al = a.length;
+		Sort.quickSort(a, 0, al-1);
+		int i = 0;
+		int j = al - 1;
+		int sum = 0;
+		while(i < j) {
+			sum = a[i] + a[j];
+			if(sum < v) {
+				i++;
+			} else if(sum > v){
+				j--;
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void findTriangles() {
+		int[] a = {9,8,6,7,2};
+		for(int i=0; i<a.length; i++) {
+			for(int j = i+1; j<a.length; j++) {
+				for(int k = j+1; k<a.length; k++) {
+					if(a[i]+a[j] > a[k] && a[j]+a[k] > a[i] && a[k]+a[i] > a[j]) {
+						System.out.println(a[i]+" "+a[j]+" "+a[k]);
+					}
+				}
+			}
+		}
+	}
+		
 	public static void main(String[] args) {
 		//insertionSort(new int[]{5,2,-1,6,12,1,0});
 		MiscQ t = new MiscQ();
@@ -253,8 +310,10 @@ public class MiscQ {
 		t.convertToInt("2147483647");
 		t.arraySum();
 		t.findDuplicatePairs();
-		t.findAppts();
+		t.findFreeAppointments();
 		t.countTopFiveWords();
+		t.sumExSorted(new int[]{3,13,11,6}, 17);
+		findTriangles();
 	}
 
 }

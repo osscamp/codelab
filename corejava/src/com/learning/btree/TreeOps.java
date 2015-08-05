@@ -1,5 +1,7 @@
 package com.learning.btree;
 
+import java.util.List;
+
 
 public class TreeOps {
 	
@@ -119,6 +121,14 @@ public class TreeOps {
 		TreeOps.insertBalancedNode2(root, Integer.MAX_VALUE);
 		System.out.println(TreeOps.prettyPrint(root, new ObjectCounter(20), new StringBuilder()));
 		//inorderWalk(root);
+		
+		root = createRoot(15);
+		TreeOps.insertNode(root, 8);
+		TreeOps.insertNode(root, 10);
+		TreeOps.insertNode(root, 21);
+		TreeOps.insertNode(root, 17);
+		TreeOps.insertNode(root, 28);
+		printBFS(root);
 	}
 	
 	static int[] inputNodes = {1,2,4,8,16,32,64,128,256,512,1024,2048,4096};
@@ -148,6 +158,32 @@ public class TreeOps {
 				TreeOps.insertNode(root, inputNodes[mid]);
 			}
 				
+		}
+	}
+	
+	public static void printBFS(Node n) {
+		if(n == null) { return; }
+		java.util.LinkedList<Node> q = new java.util.LinkedList<>();
+		q.add(n);
+		q.add(null);
+		StringBuilder sb = new StringBuilder();
+
+		while (!q.isEmpty()) {
+			Node p = q.peek();
+			if(p == null) {
+				System.out.println(sb);
+				q.remove();
+				sb = new StringBuilder();
+			} else {
+				while(q.peek() != null) {
+					p = q.pollFirst();
+					sb.append(p.data).append(" ");
+					if(p.left != null) { q.add(p.left); }
+					if(p.right != null) { q.add(p.right); }
+					
+				}
+				q.add(null);
+			}
 		}
 	}
 

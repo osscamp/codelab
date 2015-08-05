@@ -1,6 +1,9 @@
 package com.learning.btree;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 public class JavaBasics {
@@ -61,20 +64,25 @@ public class JavaBasics {
 	public static void reverseWordsWithoutSplit(String str) {
 		char[] arr = str.toCharArray();
 		reverseByArray(arr, 0, arr.length-1);
-		System.out.println(String.valueOf(arr));
+		//System.out.println(String.valueOf(arr));
 
-		int ws = 0;
-		int we = 0;
+		char prev = ' ';
+		int si = 0;
 		for(int i=0; i<arr.length; i++) {
-			if(arr[i] == ' '){
-				we = i-1;
-				if(we > ws+1) {
-					reverseByArray(arr, ws, we);
-				}
-				ws = we+2;
+			char cc = arr[i];
+			//tset dns yrt
+			if(cc== ' ' && prev != ' ') {
+				reverseByArray(arr, si, i-1);
+				si = Math.min(i+1, arr.length-1);
+			} else if(i > 0 && cc != ' ' && prev == ' ') {
+				si = Math.min(i, arr.length-1);
 			}
+			else if(i==arr.length-1) {
+				reverseByArray(arr, si, i);
+			}
+			prev = cc;
 		}
-		System.out.println(String.valueOf(arr));
+		System.out.println("reversed "+String.valueOf(arr));
 	}
 	
 	public static long fact(int n) {
@@ -82,6 +90,25 @@ public class JavaBasics {
 			return n*fact(n-1);
 		}
 		return 1l;
+	}
+	
+	
+	public static long power(int a, int b) {
+		if(a == 0 && b == 0) {
+			return -1;
+		}
+		if(b <  0) {
+			return -1;
+		}
+		if(b == 0) { return 1;}
+		long res = (long)a;
+		if(b %2 == 0) {
+			res = power(a, b/2);
+			return res*res;
+		} else {
+			res = power(a, b/2);
+			return res*res*a;
+		}
 	}
 	
 	public static void fibonacci(int n) {
@@ -93,6 +120,17 @@ public class JavaBasics {
 			prev = next;
 			System.out.println(next);
 		}
+	}
+	
+	public static void countStairs(int n) {
+		int[] ctr = new int[n];
+		ctr[0] = 1;
+		ctr[1] = 1;
+		for(int i=2; i<n; i++) {
+			ctr[i] = ctr[i-1]+ctr[i-2];
+		}
+		System.out.println("STAIRS "+ctr[ctr.length-1]);
+		MaxHeap.printArray(ctr);
 	}
 	
 	public static int fibonacciR(int n) {
@@ -128,10 +166,12 @@ public class JavaBasics {
 	}
 	
 	public static void printTriangle(int numrows) {
+		int ct = 1;
 		for(int i=1; i<=numrows; i++) {
 			StringBuilder sb = new StringBuilder();
 			for (int j=1; j<=i; j++) {
-				sb.append(j).append(" ");
+				sb.append(ct).append(" ");
+				ct++;
 			}	
 			System.out.println(sb.toString());
 		}
@@ -139,25 +179,46 @@ public class JavaBasics {
 	
 	public static Set<String> permuteString(String input) {
 	    Set<String> set = new HashSet<String>();
-	    if (input == "")
+	    if(input == null) {
+	    	return null;
+	    }
+	    if (input.length() == 0){
+	    	set.add("");
 	        return set;
-	    Character a = input.charAt(0);
-	    if (input.length() > 1)
-	    {
-	        input = input.substring(1);
-	        Set<String> permSet = permuteString(input);
-	        for (String x : permSet)
-	        {
-	            for (int i = 0; i <= x.length(); i++)
-	            {
-	                set.add(x.substring(0, i) + a + x.substring(i));
-	            }
-	        }
-	    }
-	    else
-	    {
-	        set.add(a + "");
-	    }
+	    }  
+	    char first = input.charAt(0);
+        input = input.substring(1);
+        Set<String> permSet = permuteString(input);
+        for (String x : permSet)
+        {
+            for (int i = 0; i <= x.length(); i++)
+            {
+                set.add(x.substring(0, i) + first + x.substring(i));
+            }
+        }
+	    return set;
+	}
+	
+	public static Set<List<Integer>> permuteInts(List<Integer> input) {
+	    Set<List<Integer>> set = new HashSet<List<Integer>>();
+        if (input.isEmpty()) {
+        	set.add(new ArrayList<Integer>());
+            return set;
+        }
+	    Integer a = input.get(0);
+        List<Integer> rest = input.subList(1, input.size());
+        Set<List<Integer>> permSet = permuteInts(rest);
+        for (List<Integer> x : permSet) {
+        	Set<List<Integer>> subLists = new HashSet<List<Integer>>();
+            for (int i = 0; i <= x.size(); i++) {
+				List<Integer> subList = new ArrayList<Integer>();
+				subList.addAll(x);
+				subList.add(i,a);
+				subLists.add(subList);
+            }
+	        set.addAll(subLists);
+        }
+
 	    return set;
 
 	}
@@ -177,18 +238,6 @@ public class JavaBasics {
 	}
  	
 	public static void hanoi(int n, int fromPeg, int toPeg, int spare) {
-//		int helpPeg;
-//		String sol1, sol2, myStep, mySol;
-//		if(n == 1) {
-//			return fromPeg + " -> " + toPeg + "\n";
-//		} else {
-//			helpPeg = 6 - fromPeg- toPeg;
-//			sol1 = hanoi(n-1, fromPeg, helpPeg);
-//			myStep = fromPeg + " -> " + toPeg + "\n"; 
-//			sol2 = hanoi(n-1, helpPeg, toPeg); 
-//			mySol = sol1 + myStep + sol2; 
-//			return mySol;
-//		}
 		if(n == 1) {
 			System.out.println(fromPeg + " -> " + toPeg);
 		} else {
@@ -252,7 +301,7 @@ public class JavaBasics {
 	public static void findMaxOnes() {
 		int maxones = -1;
 		int maxonesidx = -1;
-		int[][] a = {{0,0,1,1,1},{0,0,0,0,1},{0,0,1,1,1},{0,1,1,1,1},{0,0,0,1,1}};
+		int[][] a = {{0,0,0,0,1},{0,0,0,0,1},{0,0,0,1,1},{0,0,0,0,1},{0,0,0,1,1}};
 		int n = a.length;
 		for(int i = 0; i<n; i++) {
 			int[] aa = a[i];
@@ -286,11 +335,219 @@ public class JavaBasics {
 		System.out.println("maxones at "+maxonesidx);
 	}
 	
+	public static String convertToHex(int number) {
+		number--;
+		int rem = number % 26;
+		String result = "";	
+		if(number - rem == 0) {
+			result = ""+toChar(rem);
+		} else {
+			result = convertToHex((number-rem)/26)+toChar(rem);
+		}
+		System.out.println("16 result "+result);
+		return result;
+	}
+	
+	public static char toChar(int n){
+		char[] a= "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+		return a[n];
+	}
+	
+	//doesn't work
+	public static void findInMatrix() {
+		char[][] arr = {
+				{'n','b','c','d','e','f'},
+				{'z','n','a','b','c','l'},
+				{'f','l','f','a','n','c'}};
+		String toFind = "bnf";
+		int L = 6;
+		int D = 3;
+		boolean found = false;
+		int matchct = 0;
+		int loopct = 0;
+		for(int i=0; i<D; i++) {
+			for(int j=0; j<L; j++) {
+				char ch = arr[i][j];
+				int iMem = i;
+				int jMem = j;
+				if(ch == toFind.charAt(0)) {
+					matchct=1;
+					int p=1;
+					for(p=1; p<toFind.length(); p++) {
+						char nc = toFind.charAt(p);
+						//check left
+						if(j>0 && arr[i][j-1] == nc){ matchct++; j=j-1;}
+						else if(j<L-1 && arr[i][j+1] == nc){ matchct++; j=j+1;} 
+						else if(i>0 && arr[i-1][j] == nc){matchct++; i=i-1;}
+						else if(i<D-1 && arr[i+1][j] == nc){matchct++; i=i+1;}
+						else if(i>0 && j>0 && arr[i-1][j-1] == nc){matchct++; i=i-1; j=j-1;}
+						else if(i>0 && j<L-1 && arr[i-1][j+1] == nc){matchct++; i=i-1; j=j+1;}
+						else if(i<D-1 && j>0 && arr[i+1][j-1] == nc){matchct++; i=i+1; j=j-1;}
+						else if(i<D-1 && j<L-1 && arr[i+1][j+1] == nc){
+							matchct++; 
+							i=i+1;j=j+1;
+						}
+
+						if(matchct >= toFind.length()) {
+							found = true;
+							break;								
+						}
+					}
+					if(p == toFind.length()) {
+						i = iMem;
+						j = jMem;
+					}
+				}
+				if(found) {
+					break;
+				}
+			}
+			if(found) {
+				break;
+			}
+		}
+		System.out.println("isFound "+found+" loops "+loopct);	
+	}
+
+	
+	public static void mergeArraysRemovingCommon() {
+		int[] a1 = {2,6,8,9,13,18,21,36};
+		int[] a2 = {3,6,9,12,17,21,28};
+		int i=0;
+		int j=0;
+		int k = 0;
+		int L1 = a1.length;
+		int L2 = a2.length;
+		int[] merged = new int[L1+L2];
+		while(i<L1 || j<L2) {
+			if((i<L1 && j<L2 && a1[i] < a2[j])
+					|| (i<L1 && j>=L2)) {
+				merged[k] = a1[i];
+				i++;
+			}
+			else if((i<L1 && j<L2 && a1[i] > a2[j])
+					|| (j<L2 && i>=L1)) {
+				merged[k] = a2[j];
+				j++;
+			}
+			else if(i<L1 && j<L2 && a1[i] == a2[j]) {
+				merged[k] = a2[j];
+				j++;
+				i++;
+			}
+			k++;
+		}
+	}
+	
+	public static int gcd(int p, int q) {
+		if(q == 0) {
+			return p;
+		}
+		else {
+			return gcd(q, p%q);
+		}
+	}
+	
+	public static String intToBin(int N) {
+		if(N <= 1) {
+			return "1";
+		} else {
+			return intToBin(N/2) + N%2;
+		}
+	}
+	
+	public static void countwords() {
+		String s = "at    ";
+		int count = 0;
+		int length = s.length()-1;
+		char prev = ' ';
+
+		for(int i=length; i>=0; i--) {
+			char c = s.charAt(i);
+			if(c != prev && prev == ' ') {
+				count++;
+			}
+			prev = c;
+		}
+		System.out.println(count);
+	}
+	
+	public static void countwords1() {
+		String s = "  \n  ";
+		int count = 0;
+		int length = s.length()-1;
+		char prev = ' ';
+		Set<Character> tokens = new HashSet<>();
+		tokens.add(' ');
+		tokens.add('\n');
+		tokens.add('\t');
+		for(int i=length; i>=0; i--) {
+			char c = s.charAt(i);
+			if(!tokens.contains(c) && tokens.contains(prev)) {
+				count++;
+			}
+			prev = c;
+		}
+		System.out.println("word ct "+count);
+	}
+	
+	public static String convertToIP(String binaryIP) {
+		if(binaryIP == null || binaryIP.length() != 32) {
+			return "0";
+		}
+		StringBuilder ip = new StringBuilder();
+		int pow = 0;
+		int v = 0;
+		for(int i=binaryIP.length()-1; i>=0; i--) {
+			char c = binaryIP.charAt(i);
+			int d = c - '0';
+			if(d < 0 || d > 1) { return "0"; }
+			v = v+(d*(int)Math.pow(2, pow));
+			if(i % 8 == 0) {
+				ip.insert(0, v);
+				if(i > 0) {
+					ip.insert(0,'.');
+				}
+				pow = -1;
+				v = 0;
+			}
+			pow++;
+		}
+		System.out.println("ip "+ip);
+		return ip.toString();
+	}
+	
+	public static int sumdigits(int n) {
+		int sum = 0;
+		while (n > 0){
+			sum += n%10;
+			if(sum>=10) {
+				sum = sum%10+(sum/10)%10;
+			}
+			n/=10;
+		}
+		return sum;
+	}
+	
+	public static int sumdigits2(int n) {
+
+		return (n%9 == 0 && n != 0) ? 9 : n%9;
+	}
+	
+	public static void sumWithoutPlusOp(int a, int b) {
+		while(b != 0) {
+			int carry = a & b;
+			a = a ^ b;
+			b = carry << 1;
+		}
+		System.out.println("sum "+a);
+	}
+	
 
 	public static void main(String[] args) {
 		System.out.println(reverseByArray("valet"));
 		System.out.println("fact 4="+fact(4));
-		System.out.println(reverseByRecursion("toysand new"));
+		System.out.println(reverseByRecursion("toysand  new"));
 		fibonacci(8);
 		System.out.println(fibonacciR(8));
 		reverseWords("a new cent");
@@ -299,14 +556,57 @@ public class JavaBasics {
 		replaceSpaces("space string");
 		printTriangle(4);
 		
-		String s = "I  am student";
+		String s = "I am student a b c";
 		reverseWordsWithoutSplit(s);
-		hanoi(2, 1, 3, 2);
+		hanoi(3, 1, 3, 2);
 		//System.out.println(hanoi);
-		numDigitCount(895, 9);
+		numDigitCount(118, 1);
 		System.out.println("i num "+isNumeric("-2342.09"));
 		findMaxOnes();
+		System.out.println(permuteString("abc"));
+		List<Integer> ilist = new ArrayList<>();
+		ilist.add(1);
+		ilist.add(2);
+		ilist.add(3);
+		System.out.println(permuteInts(ilist));
+		System.out.println("power "+power(2, 8));
+		convertToHex(31);
+		findInMatrix();
+		mergeArraysRemovingCommon();
+		System.out.println("gcd "+gcd(49, 21));
+		System.out.println(intToBin(11));
+		countwords();
+		countwords1();
+		int a = -5>>3;
+		int b = -5 >>> 3;
+		System.out.println("xx "+a);
+		System.out.println(b);
+		int k = 20;
+		int n = 15;
+		System.out.println(k^n);
 		
+		a = 128;
+		System.out.println("erth"+a);
+
+		  a ^= a >>> 32; 
+		  a ^= a >>> 16; 
+		  a ^= a >>>  8; 
+		  a ^= a >>>  4; 
+		  a ^= a >>>  2; 
+		  a ^= a >>>  1; 
+		  System.out.println(a & 1);
+		  
+		  a = (int)Math.pow(2, 30); b=4;
+		  System.out.println(a*b);
+		  convertToIP("01010000000100000000000000000001");
+		  System.out.println(Math.abs(Integer.MIN_VALUE+1));
+		  System.out.println(sumdigits(19227887));
+		  System.out.println(sumdigits2(122));
+		  Random rdm = new Random();
+		  System.out.println(rdm.nextInt(5-3+1)+3);
+		  countStairs(10);
+		  sumWithoutPlusOp(45, 5);
+
 	}
 	
 }
