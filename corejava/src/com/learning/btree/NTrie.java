@@ -109,12 +109,12 @@ class NTrie {
 		tn.addWord("carnival");
 		tn.addWord("red");
 		tn.addWord("rem");
-		tn.getWords("c");
+		tn.getWords("r");
 
 
 		//System.out.println(tn.root);
 		try {
-			tn.autocompleteSite();
+			//tn.autocompleteSite();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -124,29 +124,33 @@ class NTrie {
 	
 	public void autocompleteSite() throws Exception {
 		NTrie tn = new NTrie();
-		String url = "http://www.ebay.com/gds/Big-City-Dog-Tips-by-Justin-Silver-/10000000189742252/g.html";
+		String url = "https://www.gutenberg.org/files/98/98-h/98-h.htm";
 		URL website = new URL(url);
 		URLConnection connection = website.openConnection();
-		connection.setReadTimeout(10000);
+		connection.setReadTimeout(100000);
         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(
                                     connection.getInputStream()));
         StringBuilder response = new StringBuilder();
         String inputLine;
 
+        int totalWords = 0;
         while ((inputLine = in.readLine()) != null) {
         	String[] strings = inputLine.split("[^a-zA-Z0-9']+");
         	for(String s : strings) {
         		s = s.toLowerCase();
+        		totalWords++;
         		tn.addWord(s);
         		//System.out.println(s);
         	}
-            response.append(inputLine);
         }
         in.close();
+        System.out.println("words indexed "+totalWords);
         //System.out.println(tn.root);
-        tn.getWords("ju");
-        
+        long st = System.nanoTime();
+        tn.getWords("water");
+        long et = System.nanoTime();
+        System.out.println("micro sec "+(et-st)/Math.pow(10, 3));
 	}
 
 }

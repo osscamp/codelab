@@ -1,9 +1,10 @@
 package com.learning.btree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class ArrayOps {
 	
@@ -64,6 +65,43 @@ public class ArrayOps {
 	    }
 	 
 	    return r;
+	}
+	
+	//kadane's algorithm
+	//max increasing subsequence
+	public static int[] findMaxSumSubArray() {
+		int[] a = new int[]{-2, -3, 4, -1, -2, 1, 5, -3};
+		int[] ids = new int[2];
+		ids[0] = ids[1] = 0;
+		int s=0, e=0, ct=0;
+		int maxsum = Integer.MIN_VALUE;
+		int max_ending_here = 0;
+		for(int i = 0; i<a.length; i++) {
+			max_ending_here += a[i];
+            if(max_ending_here < 0) {
+            	max_ending_here = 0;
+            	ct = i+1;
+            }
+            if(max_ending_here > maxsum) {
+            	maxsum = max_ending_here;
+            	s = ct;
+            	e = i;
+            }
+
+		}
+		System.out.println("maxsum "+maxsum+" ids ["+s+" "+e+"]");
+		return ids;
+	}
+	
+	public static void findMaxSumSubArray2() {
+		int[] a = new int[]{-2, -3, 4, -1, -2, 1, 5, -3};
+		int max_so_far = a[0];
+		int curr_max = a[0];
+		for(int i=1; i<a.length; i++) {
+			curr_max = Math.max(a[i],  curr_max+a[i]);
+			max_so_far = Math.max(max_so_far, curr_max);
+		}
+		System.out.println("MAX SUM SUBA 2="+max_so_far);
 	}
 	
 	
@@ -129,7 +167,7 @@ public class ArrayOps {
 		}
 		for(int j=0; j<alive.length; j++) {
 			if(alive[j] > 0) {
-				System.out.println("index "+j+" val "+alive[j]);
+				System.out.println("index "+j+" alive val "+alive[j]);
 			}
 		}
 	}
@@ -309,39 +347,79 @@ public class ArrayOps {
 		System.out.println("mmmax diff forward "+maxdiff);
 	}
 	
-	public static int[] findMaxSumSubArray(int[] a) {
-		int[] ids = new int[2];
-		ids[0] = ids[1] = 0;
-		int minidx = -1;
-		int minsum = 0;
-		int maxsum = 0;
-		int sum = 0;
-		for(int i = 0; i<a.length; i++) {
-			sum += a[i];
-			if(sum < minsum) {
-				minsum = sum;
-				minidx = i;
-			} else if(sum - minsum > maxsum) {
-				maxsum = sum - minsum;
-				ids[0] = minidx + 1;
-				ids[1] = i;
-			}
-		}
-		System.out.println("maxsum "+maxsum+" ids ["+ids[0]+" "+ids[1]+"]");
-		return ids;
-	}
-	
 	//incorrect, intervals need to be sorted by start time.
 	public static void findIntervalRange() {
-		int[][] tuples = {{1,3},{2,5},{8,10},{4,9}};
-		int rangeend = tuples[0][1];
-		for(int i=0; i<tuples.length-1; i++) {
-			if(tuples[i+1][0] <= rangeend && tuples[i+1][1] > rangeend) {
-				rangeend = tuples[i+1][1];
-			} 
+		//sorted by start
+		int[][] iv = {
+				{0,3},
+				{2,6},
+				{2,5},
+				{8,9}
+		};
+		List<int[]> result = new ArrayList<>();
+		int[] prev = null;
+		for(int i=0; i<iv.length; i++) {
+			if(prev == null) {
+				prev = iv[i];
+				result.add(prev);
+				continue;
+			}else {
+				int[] c = iv[i];
+				int cst = c[0];
+				int pst = prev[0];
+				int cend = c[1];
+				int pend = prev[1];
+				if(cst >= pst && cst <= pend) {
+					int mst = pst;
+					int mend = Math.max(cend, pend);
+					int[] merged = new int[]{mst, mend};
+					result.remove(result.size()-1);
+					result.add(merged);
+					prev = merged;
+
+				}else {
+					result.add(c);
+					prev = c;
+				}
+			}
 		}
-		System.out.println("end range "+rangeend);
+		for(int[] p : result) {
+			MaxHeap.printArray(p);
+		}
 		
+	}
+	
+	public static void totalCovered(){
+		int[][] iv = {
+				{0,1},
+				{1,9},
+				{3,5},
+				{4,8},
+				{11,14}
+		};
+		int total = 0;
+		if(iv.length == 0 )return;
+		if(iv.length==1) {
+			total = iv[0][1] - iv[0][0];
+			System.out.println("cov intvl "+total);
+			return;
+		}
+		int[] p = iv[0];
+		for(int i=1; i<iv.length; i++){
+			int[] c = iv[i];
+			//overlap
+			if(p[1] >= c[0] && p[1] <= c[1]) {
+				p[1] = c[1];
+
+			}else if(p[1] < c[0]) {
+				total += (p[1] - p[0]);
+				p = c;
+			}
+			if(i == iv.length-1) {
+				total += (p[1] - p[0]);
+			}
+		}
+		System.out.println("total overlap "+total);
 	}
 	
 	//zero out row or column containing 0
@@ -370,20 +448,83 @@ public class ArrayOps {
 		}
 	}
 	
-	public static void randomizeShuffleArray(int[] a) {
+	public static void randomizeShuffleArray() {
+		int[] a = new int[]{2,3};
 		int len = a.length;
 		int rnd = 0;
 		Random rn = new Random();
 
 		for(int i=len-1; i>0; i--) {
-			//rnd = rn.nextInt(len - i) + i;
 			rnd = rn.nextInt(i+1);
-			System.out.println(rnd);
+			System.out.println("random "+rnd+ " " + i);
 			int tmp = a[rnd];
 			a[rnd] = a[i];
 			a[i] = tmp;
 		}
 		MaxHeap.printArray(a);
+	}
+	
+	public static void rightIntersectWithDedupe() {
+		int[] a = new int[] {1,5,8,8,8,8,11,17};
+		int[] b = new int[] {2,5,5,8,8,13,17,29,69};
+		int[] res = new int[b.length];
+		int i=0,j=0,k=0;
+		int prevB = -1;
+		while(j<b.length ) {
+			if(i<a.length && a[i] < b[j]) {
+				i++;
+			} else if((i<a.length && a[i] > b[j]) || (i>=a.length)) {
+				if(prevB != b[j]) {
+					res[k] = b[j];
+					k++;
+				}
+				prevB = b[j];
+				j++;
+			} else {
+				prevB = b[j];
+				i++;
+				j++;
+			}
+			
+		}
+		System.out.println("right inter ");
+		MaxHeap.printArray(res);
+				
+	}
+	
+	public static void leftIntersectWithDedupeList() {
+		List<Integer> a = Arrays.asList(new Integer[] {2,8,8,8,9});
+		List<Integer> b = Arrays.asList(new Integer[] {2,5,8,8});
+		List<Integer> res = new ArrayList<>();
+		int prevA = -1;
+		Iterator<Integer> aItr = a.iterator();
+		Iterator<Integer> bItr = b.iterator();
+		Integer aVal = aItr.hasNext() ? aItr.next() : null;
+		Integer bVal = bItr.hasNext() ? bItr.next() : null;
+		do {
+			if(aVal == null) {
+				break;
+			}
+			if(bVal != null && bVal < aVal) {
+				bVal = bItr.hasNext() ? bItr.next() : null;
+			} else if((bVal != null && bVal > aVal) 
+					|| (!bItr.hasNext() && (bVal != null && bVal > aVal)) 
+					|| (bVal == null && !bItr.hasNext())) {
+				if(prevA != aVal) {
+					res.add(aVal);
+				}
+				prevA = aVal;
+				aVal = aItr.hasNext() ? aItr.next() : null;
+			} else {
+				prevA = aVal;
+				aVal = aItr.hasNext() ? aItr.next() : null;
+				bVal = bItr.hasNext() ? bItr.next() : null;
+			}
+			
+		}
+		while(aVal != null);
+		System.out.println(res);
+				
 	}
 	
 	/*
@@ -443,15 +584,489 @@ public class ArrayOps {
 		System.out.println("lidx "+maxd);
 		
 	}
+	
+	public void printSpiral(){
+		int[][] a = {
+				{1 ,2 ,3 ,4 ,21},
+				{5 ,6 ,7 ,8 ,22},
+				{9 ,10,11,12,23},
+				{13,14,15,16,24},
+				{31,34,38,39,41}
+				};
+		int level = 0;
+		int n = a[0].length;
+		int r = 0;
+		int c = 0;
+		while(n > r) {			
+			while(c < n) {
+				System.out.println(a[r][c]);
+				c++;
+			}
+			c--;
+			r++;
+			while(r < n) {
+				System.out.println(a[r][c]);
+				r++;			
+			}
+			r--;
+			c--;
+			while(c >= level) {
+				System.out.println(a[r][c]);
+				c--;
+			}
+			c++;
+			r--;
+			while(r >= level) {
+				System.out.println(a[r][c]);
+				r--;
+			}
+			n--;
+			r+=2;
+			c++;
+			level++;
+		}
+	}
+	
+	public static void printMatrixDiagonally() {
 
+	    int[][] m = {
+	                        {1,2,3,4,5,},
+	                        {18,19,20,21,6},
+	                        {17,28,29,22,7},
+	                        {16,27,30,23,8},
+	                        {15,26,25,24,9},
+	                        {14,13,12,11,10}
+	                     };
+
+	    int M = m[0].length;
+	    int N = m.length;
+	    int MM = M;
+	    int NN = N;
+	    if(M <=1 || N <= 1) { return; }
+	    int ct = 0;
+	    int MAX = M*N;
+	    int[] res = new int[MAX];
+	    int i=0, j=0;
+	    int level = 0;
+	    int levelct = 0;
+	    while(ct < MAX) {
+	        res[ct] = m[i][j];
+	        if(i == level && j<M-1-level) j = Math.min(++j, M-1-level);
+	        else if(j==M-1-level && i<N-1-level) i = Math.min(++i, N-1-level);
+	        else if(i==N-1-level && j>level) j = Math.max(0, --j);
+	        else if(j==level && i>level) i = Math.max(0, --i);
+	        
+	        ct++;
+	        levelct++;
+	        if(levelct == (MM-level)*(NN-level) - (MM-level-2)*(NN-level-2)) {
+	            level++;
+	            i=level;
+	            j=level;
+	            levelct=0;
+	            MM--;
+	            NN--;
+	        }
+	    }
+	    for(int v : res) {
+	        //System.out.println(v);
+	    }
+	}
+	
+	public static void sort2dMatrix() {
+		//sort a 2d matrix horizontally+vertically , no dupes in a row, assume data is good
+		int[][] m = {
+				{8,2,15,34},
+				{5,9,1,7},
+				{21,16,3,19}
+		};
+		int XL = m[0].length;
+		int YL = m.length;
+		
+		int[] d = new int[XL*YL];
+		int k = 0;
+
+		//sort 2d matrix into 1d array while reading using insertion sort
+		int dctr = 0;
+		for(int i=0; i<YL; i++) {
+			for( k=0; k<XL; k++) {
+				d[dctr] = m[i][k];
+				int j = dctr;
+				while(j>0 && d[j] < d[j-1]) {
+					int t = d[j];
+					d[j]= d[j-1];
+					d[j-1] = t;
+					j--;
+				}
+				dctr++;
+			}
+		}
+		
+		//MaxHeap.printArray(d);
+		k = 0;
+		int i=0, j=0;
+		while(k < d.length) {
+			if(i < YL) {
+				m[i][j] = d[k];
+				i++;
+			}
+			if(i == YL && j < XL) {
+				i=0;
+				j++;
+			}
+			k++;
+		}
+		StringBuilder sb = new StringBuilder(); //for printing
+		for(i=0; i<YL; i++) {
+			for(j=0; j<XL; j++) {
+				sb.append(m[i][j]).append(' ');
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb);
+	}
+	
+	public static void sort2dMatrixOnePass() {
+		//sort a 2d matrix horizontally+vertically , no dupes in a row, assume data is good
+		int[][] m = {
+				{8,2,15,34},
+				{5,9,1,7},
+				{21,16,3,19}
+		};
+		int XL = m[0].length;
+		int YL = m.length;
+
+
+		//sort 2d matrix while reading using insertion sort in a threaded way going from top to bottom.
+		int k = 0;
+		int i=0, j=0;
+		while(k < XL*YL) {
+			if(i < YL) {
+				int p = i;
+				int q = j;
+				int p1 = p > 0? p-1 : q > 0 ? YL-1 : p;
+				int q1 = q > 0 ? (p==0 ? q-1 : q) : q;
+				int mx = (j*YL)+i;
+				int ctr = 0;
+				while(m[p][q] < m[p1][q1]  && !(p==0 && q==0) && ctr < mx) {
+					int t = m[p][q];
+					m[p][q] = m[p1][q1];
+					m[p1][q1] = t;
+					ctr++;
+					p=p1;
+					q=q1;
+					p1 = p > 0? p-1 : q > 0 ? YL-1 : p;
+					q1 = q > 0 ? (p==0 ? q-1 : q) : q;
+				}
+				i++;
+			}
+			if(i == YL && j < XL) {
+				i=0;
+				j++;
+			}
+			k++;
+		}
+		StringBuilder sb = new StringBuilder(); //for printing
+		for(i=0; i<YL; i++) {
+			for(j=0; j<XL; j++) {
+				sb.append(m[i][j]).append(' ');
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb);
+	}
+	
+	public static void findMinSubarray() {
+	    int[] a = {1,2,3,5,8,5,9,7,7,5,11,0,7};
+	    int[] p = {5,7};
+	    int minidx = Integer.MAX_VALUE;
+	    int minMatchlength = Integer.MAX_VALUE;
+	    for(int i=0;i<a.length;i++) {
+	        if(a[i] == p[0]) {
+	            for(int k=i+1,pi=1; k<a.length; k++) {
+	                if(a[k] == p[pi]) {
+	                    pi++;
+	                    if(pi == p.length) {
+	                        //match found
+	                        int matchLen = k-i+1;
+	                        if(matchLen < minMatchlength) {
+	                            minMatchlength = matchLen;
+	                            minidx = i;
+	                        }
+
+	                        if(matchLen == p.length){//contiguous match
+	                    	    System.out.println("minidx "+minidx);
+	                            return;
+	                        }
+	                        break; //break from k loop
+	                    }
+	                }
+	            }    
+	         }       
+	     }
+	    System.out.println("minidx "+minidx);
+	 }
+	
+	public static void isToepliz() {
+	    int[][] a = {
+	    {6,7,8,2},
+	    {3,6,7,8},
+	    {9,3,6,7},
+	    {2,9,3,6},
+	    {1,2,9,3},
+	    };
+	    int XL = a[0].length;
+	    int YL = a.length;
+	    boolean isTope = true;
+	    for(int i=0; i<YL-1; i++) {
+	    	for(int j=0; j<XL-1; j++) {
+	    		if(a[i][j] != a[i+1][j+1]) {
+	    			isTope = false;
+	    		}
+	    	}
+	    }
+	    System.out.println("isT "+isTope);
+	 }  
+	
+	public static void find2Smallest() {
+		int[] a = {-5,23,-11,5,34,42,25,76,-6};
+		int min = Integer.MAX_VALUE;
+		int min2 = min;
+		int compct = 0;
+		for(int i = 0; i<a.length; i++) {
+			compct+=2;
+			if(a[i] < min) {
+				min2 = min;
+				min = a[i];
+				
+			}else if(a[i] < min2) {
+				min2 = a[i];
+				compct++;
+			}
+		}
+		System.out.println(min+" "+min2+" "+compct);
+		
+	}
+	
+	
+	//incomplete
+	public static void orderByPermutation() {
+		int[] a = {10,20,30,40,50,60,70};
+		//int[] p = {2,6,3,5,1,4,0};
+		//int[] p = {6,1,5,4,2,3,0};
+		//int[] p = {6,2,1,4,3,5,0};
+		//int[] p = {3, 1, 2,0,4,5,6}; //fails
+		int[] p = {0,1,2,3,4,5,6};
+		Random r = new Random();
+		for(int m=p.length-1; m>0; m--) {
+			int newidx = r.nextInt(m+1);
+			int tmp = p[m];
+			p[m] = p[newidx];
+			p[newidx] = tmp;
+		}
+		MaxHeap.printArray(p);
+		int replaceCt = 0;
+		int seed = p[0];
+		int beforecycle = 0;
+		int i = 0;
+		int tmp = -1;
+		int ptmp = -1;
+		while(replaceCt < a.length-1) {
+			tmp = a[i];
+			if(ptmp == -1) {
+				a[i] = a[p[i]];
+			} else {
+				a[i] = ptmp;
+			}
+			replaceCt++;
+			int k = search(p, i);
+			i = k;
+			ptmp = tmp;
+			if(i == seed) {
+				a[i] = tmp;
+				replaceCt++;
+				i = ++beforecycle;
+				if(p[i] <= replaceCt) {
+					i++;
+				}
+				seed = p[i];
+				ptmp = -1;
+				continue;
+			}
+		}
+		MaxHeap.printArray(a);
+	}
+
+	public static int search(int[] a, int v) {
+		for(int i = 0; i<a.length; i++) {
+			if(a[i] == v) {
+				return i;
+			}
+		}
+		throw new IllegalStateException();
+	}
+	
+	public static void waveArray() {
+		//assuming sorted or use quicksort
+		int[] a = {5, 8, 12, 17, 25,29};
+		for(int i=0; i<a.length-1; i++) {
+			int tmp = a[i];
+			a[i] = a[i+1];
+			a[i+1] = tmp;
+			i++;
+		}
+		MaxHeap.printArray(a);
+	}
+	
+	//find i<j such that a[i] > a[j]
+	public static void numInversions(){
+		int[] a = {2,5,4,16,11,8,12};
+		int count = 0;
+		for(int i=1; i<a.length; i++) {
+			int j = i;
+			int lcount = 0;
+			while(j > 0 && a[j] < a[j-1]) {
+				int tmp = a[j];
+				a[j] = a[j-1];
+				a[j-1] = tmp;
+				lcount = 1;
+				j--;
+			}
+			count += lcount;
+		}
+		System.out.println("inv "+count);
+		MaxHeap.printArray(a);
+	}
+	
+	public static void numInversions2(){
+		int[] a = {8,4,2,1};
+		int count = 0;
+		for(int i=0; i<a.length; i++) {
+			for(int j=i+1; j<a.length; j++){
+				if(a[j] < a[i]) {
+					count++;
+				}
+			}
+		}
+		System.out.println("inv "+count);
+		MaxHeap.printArray(a);
+	}
+	
+	public static void equilibriumPoint() {
+		//can be done in o(n)
+		int[] a = {15,17,9,12,3,1,6,50};
+		//a[mid] = find sum below, sum above 
+		int mid = a.length/2;
+		for(int k=mid; k>0; k--) {
+			int sl = 0;
+			int sr = 0;
+			for(int j=k-1; j>=0; j--) {
+				sl+=a[j];
+			}
+			for(int j=k+1; j<a.length; j++) {
+				sr+=a[j];
+			}
+			if(sl > 0 && sr > 0 && sl ==sr) {
+				System.out.println("eqb point "+k);
+				return;
+			}
+		}
+		for(int k=mid+1; k<a.length; k++) {
+			int sl = 0;
+			int sr = 0;
+			for(int j=k-1; j>=0; j--) {
+				sl+=a[j];
+			}
+			for(int j=k+1; j<a.length; j++) {
+				sr+=a[j];
+			}
+			if(sl > 0 && sr > 0 && sl ==sr) {
+				System.out.println("eqb point R "+k);
+			}
+		}
+	}
+	
+	public static void findNumber() {
+		/*
+		 * You are given an array A containing 2*N+2 positive numbers, out of which N numbers are repeated exactly 
+		 * once and the other two numbers occur exactly once and are distinct. You need to find the other two numbers
+		 *  and print them in ascending order.
+		 */
+		
+		int[] a = {1,3,4,7,1,5,3,2,4,2};
+/*
+ * Input : 1 3 5 6, n = 6
+Sum of missing integers = n*(n+1)/2 - (1+3+5+6) = 6.
+Average of missing integers = 6/2 = 3.
+Sum of array elements less than or equal to average = 1 + 3 = 4
+Sum of natural numbers from 1 to avg = avg*(avg + 1)/2
+                                     = 3*4/2 = 6
+First missing number = 6 - 4 = 2
+
+Sum of natural numbers from avg+1 to n
+                                =  n*(n+1)/2 - avg*(avg+1)/2
+                                =  6*7/2 - 3*4/2
+                                =  15
+Sum of array elements greater than average = 5 + 6 = 11
+Second missing number = 15 - 11 = 4
+ */
+		
+	}
+	
+	public static void findMaxValue() {
+//maximum value of (A[i] – i) - (A[j] – j)
+		int[] a = {3,7,4,9,6,2,11,5};
+		//find max and min of alt array (a[i]-i) in 1 pass.
+		int max = Integer.MIN_VALUE;
+		int min = Integer.MAX_VALUE;
+		for(int i=0; i<a.length; i++) {
+			int v = a[i] - i;
+			System.out.println("a[i]-i:"+v);
+			if(v > max) max = v;
+			else if(v < min) min = v;
+		}
+		if(min != Integer.MIN_VALUE)
+		System.out.println("max diff "+(max-min));
+		else
+			System.out.println("doesn't exist");
+	}
+	
+	public static void findMinDiffAnyPair() {
+		int[] a = {4,2,8,21,17,9,23};
+		//sort 2,4,8,11,17,21,23
+		int mindiff = Integer.MAX_VALUE;
+		Arrays.sort(a);
+		for(int i=a.length-1; i>0; i--) {
+			if(a[i] - a[i-1] < mindiff) {
+				mindiff = a[i] - a[i-1];
+			}
+		}
+		System.out.println("mindiff "+mindiff);
+	}
+	
+	//Given an array A of integers, find the maximum of j - i subjected to the constraint of A[i] <= A[j].
+	public static void findMaximumIndexDiff(){
+		int [] a = {3,5,4,2,7,9,21,0};
+		int maxidxdiff = Integer.MIN_VALUE;
+		for(int i=0; i<a.length; i++) {
+			for(int j=i+1; j<a.length; j++) {
+				int diff = j-i;
+				if(a[i] < a[j] && diff > maxidxdiff) {
+					maxidxdiff = j-i;
+				}
+			}
+		}
+		System.out.println("idx diff "+maxidxdiff);
+	}
+
+	
 	public static void main(String[] args) {
 
 		findNumMatrix();
-		findMaxSumSubArray(new int[]{-2,1,-3,4,-1,2,1,-5,4});
+		findMaxSumSubArray();
 		findMaxIncreasingSubArrayLength(new int[]{2,1,9,0,4,11,7,21});
 		int[] a = {-1,0,0,4,5,8,8,8,9,17,22,22,45};
 		countoccur(8,a);
-		//countMaxAlive();
+		countMaxAlive();
 		intersectionSorted(new int[]{1,5,8,8,11}, new int[]{1,2,3,8,11,11,25,35,45});
 		partition(new int[]{2,8,7,12,4,5,6,9});
 		System.out.println(isSumPresent(new int[] {1,2,3,5,7}, 14));
@@ -460,7 +1075,25 @@ public class ArrayOps {
 		findMaxDiffForward();
 		findIntervalRange();
 		mergeInPlace(new int[]{4,7,10,12,0,0,0},new int[]{13,15,18});
-		randomizeShuffleArray(new int[]{1,2,3,8,11,13,25,35,45});
-		maxGap();
+		randomizeShuffleArray();
+		rightIntersectWithDedupe();
+		leftIntersectWithDedupeList();
+		printMatrixDiagonally();
+		sort2dMatrixOnePass();
+		findMinSubarray();
+		isToepliz();
+		find2Smallest();
+		//maxGap();
+		orderByPermutation();
+		waveArray();
+		numInversions();
+		numInversions2();
+		totalCovered();
+		equilibriumPoint();
+		findMaxValue();
+		findMinDiffAnyPair();
+		findMaximumIndexDiff();
+		findMaxSumSubArray();
+		findMaxSumSubArray2();
 	}
 }

@@ -5,10 +5,10 @@ import java.util.Stack;
 public class Word2D {
 	
 	char[][] m = new char[][] {
-			{'o','s','e','v'},
-			{'z','i','r','l'},
-			{'t','l','a','i'},
-			{'e','v','t','s'},
+			{'v','s','e','v'},
+			{'l','i','r','l'},
+			{'v','e','b','i'},
+			{'e','m','t','s'},
 	};
 		
 	static class IndexHolder {
@@ -36,11 +36,12 @@ public class Word2D {
 	
 	public boolean isWord(String word) {
 		int N = m.length;
-		int sc = 0;
 		Stack<IndexHolder> st = new Stack<>();
 		for(int i=0; i<N; i++) {
 			for(int j=0; j<N; j++) {
 				boolean dec = false;
+				int sc = 0;
+
 				if(m[i][j] == word.charAt(sc)) {
 					boolean[][] visited = new boolean[N][N];
 					visited[i][j] = true;
@@ -107,15 +108,75 @@ public class Word2D {
 						}
 					}
 				}
-				sc = 0;
+				//sc = 0;
 			}
 		}
 		return false;
 	}
 	
+	public boolean isWordDFS(String w){
+		boolean exist = false;
+		for(int i=0; i<m.length; i++){
+			for(int j =0;j<m.length;j++){
+				exist = dfs(w, 0, i, j, new boolean[m.length][m.length]);
+				if(exist) {
+					System.out.println("finally "+exist+" "+i+" "+j);
+					break;
+				}
+			}
+			if(exist) break;
+		}
+		return exist;
+	}
+	
+	public boolean dfs(String w, int index, int i, int j, boolean[][] marked) {
+		if(isOOB(i,j)){
+			return false;
+		}
+
+
+		char c = w.charAt(index);
+		if(c==m[i][j]){
+			if(marked[i][j]){
+				return false;
+			}else{
+				marked[i][j] = true;
+			}
+			if(index == w.length()-1){
+				System.out.println("str is found ");
+				return true;
+			}
+/*			boolean r = dfs(w, index+1, i, j+1, marked);
+			if(r) return r;
+			r = dfs(w, index+1, i, j-1, marked);
+			if(r) return r;
+			r = dfs(w, index+1, i+1, j, marked);
+			if(r) return r;
+			r = dfs(w, index+1, i-1, j, marked);
+			if(r) return r;*/
+			return dfs(w, index+1, i, j+1, marked)
+			||
+			dfs(w, index+1, i, j-1, marked)
+			||
+			dfs(w, index+1, i+1, j, marked)
+			||
+			dfs(w, index+1, i-1, j, marked);
+		}
+		return false;
+	}
+	
+	public boolean isOOB(int i, int j) {
+		int N = m.length;
+		if(i < 0 || i >= N || j < 0 || j >= N) return true;
+		return false;
+	}
+	
 	public static void main(String[] args) {
 		Word2D w2d = new Word2D();
-		System.out.println("isFound "+w2d.isWord("siltv"));;
+		System.out.println("isFound "+w2d.isWord("silveb"));;
+		w2d = new Word2D();
+		w2d.isWordDFS("silver");
+
 	}
 
 }

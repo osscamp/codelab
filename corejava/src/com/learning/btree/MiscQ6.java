@@ -1,6 +1,8 @@
 package com.learning.btree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -291,6 +293,32 @@ public class MiscQ6 {
 		}
 	}
 	
+	public static String findMinLengthWordContainingAllChars(char[] chars, List<String> words) {
+		String minLengthMatch = null;
+		BitSet charSet = new BitSet(256);
+		for(String word : words) {
+			for(int i = 0; i<word.length(); i++) {
+				char cc = word.charAt(i);
+				charSet.set(cc);
+			}
+			boolean fullMatch = true;
+			for(char cc: chars) {
+				if(!charSet.get(cc)) fullMatch = false;
+			}
+			if(fullMatch) {
+				if(minLengthMatch == null) minLengthMatch = word;
+				else{
+					if(word.length() < minLengthMatch.length()) {
+						minLengthMatch = word;
+					}
+				}
+			}
+			charSet.clear();
+		}
+		System.out.println(minLengthMatch);
+		return minLengthMatch;
+	}
+	
 	public static void main(String[] args) {
 		MiscQ6.find5PrimesfromN();
 		MiscQ6.find5PrimesfromNBruteForce();
@@ -300,6 +328,8 @@ public class MiscQ6 {
 		substringAnagram();
 		sortAlphanumOrderIntact();
 		printMatrixDiagonally();
+		findMinLengthWordContainingAllChars(new char[]{'E','U','I','O'}, 
+				Arrays.asList(new String[]{"EULIOER","EULIOT","EHUG"}));
 	}
 
 }

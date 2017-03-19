@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-public class FinalPractice {
+public class TopKFrequent {
 	
 	static class Wrapper {
 		String key;
@@ -95,6 +95,30 @@ public class FinalPractice {
 		System.out.println(terms);
 		System.out.println(pq1);		
 
+	}
+	
+	public static void top4Ips() {
+		String ips = "192.168.214.121,192,168.214.101,192,168.214.102,192,168.215.131,192,162.210.85,192.100.211.12,200.3.4.5,12.13.14.15";
+		Map<String, Integer> map = new HashMap<>();
+
+		String[] aips = ips.split("\\s+");
+		for(String ip : aips){
+			String[] ipp = ip.split("\\.");
+			if(ipp.length == 4) {
+				Integer ct0 = map.get(ipp[0]);
+				map.put(ipp[0], ct0 == null ? 1 : ++ct0);
+				
+				Integer ct1 = map.get(ipp[0]+ipp[1]);
+				map.put(ipp[0]+ipp[1], ct1 == null ? 1 : ++ct1);
+				
+				Integer ct2 = map.get(ipp[0]+ipp[1]+ipp[2]);
+				map.put(ipp[0]+ipp[1]+ipp[2], ct2 == null ? 1 : ++ct2);
+				
+				Integer ct3 = map.get(ipp[0]+ipp[1]+ipp[2]+ipp[3]);
+				map.put(ipp[0]+ipp[1]+ipp[2]+ipp[3], ct3 == null ? 1 : ++ct3);
+			}
+		}
+		PriorityQueue pq = new PriorityQueue<>(4, new EntryComparator());
 	}
 
 	

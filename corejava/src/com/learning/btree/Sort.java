@@ -1,6 +1,6 @@
 package com.learning.btree;
 
-import java.util.Arrays;
+import java.util.Random;
 
 public class Sort {
 		
@@ -18,6 +18,22 @@ public class Sort {
 			}
 		}
 		System.out.println("invoc "+invoc);
+	}
+	
+	public static void selectionSort(int[] a) {
+		for(int i = 0; i<a.length; i++) {
+			int min = i;
+			for(int j=i+1; j<a.length; j++) {
+				if(a[j] < a[min]) {
+					min = j;
+				}
+			}
+			int t = a[min];
+			a[min] = a[i];
+			a[i] = t;
+			
+		}
+		MaxHeap.printArray(a);
 	}
 	
 	public static void insertionSort(int[] a) {
@@ -155,21 +171,20 @@ public class Sort {
 	public static int kthPartition(int[] a, int l, int r) {
 		//int len = a.length;
 		int pivot = a[r - 1];
-		int i = l;
-		for(int j=i; j<r; j++) {
+		int j = l;
+		for(int i=l; i<r; i++) {
 			if(a[j] < pivot) {
 				int tmp = a[j];
 				a[j] = a[i];
 				a[i] = tmp;
-				i++;
+				j++;
 			}
-			//j++;
 		}
-		int tmp = a[i];
-		a[i] = pivot;
+		int tmp = a[j];
+		a[j] = pivot;
 		a[r - 1] = tmp;
-		System.out.println("pivot pos "+i);
-		return i;
+		System.out.println("pivot pos "+j);
+		return j;
 	}
 
 	
@@ -202,56 +217,94 @@ public class Sort {
 		
 	}
 	
-	public static void sort3values() {
-		char[] a = "bbgbrr".toCharArray();
-		int ctr = 0;
-		int ridx = getRidx(a, 0);
-		int bidx = getBidx(a, a.length - 1);
-		boolean ismodified = false;
-		while(ctr <= bidx && ridx < bidx) {
-			if(a[ctr] == 'r' && ridx < ctr) {
-				char tmp = a[ctr];
-				a[ctr] = a[ridx];
-				a[ridx] = tmp;
-				ridx = getRidx(a, ridx);
-				bidx = getBidx(a, bidx);
-			} else if(a[ctr] == 'b'){
-				char tmp = a[ctr];
-				a[ctr] = a[bidx];
-				a[bidx] = tmp;
-				bidx = getBidx(a, bidx);
-				ridx = getRidx(a, ridx);
-				ismodified = true;
-			}
-			if(ctr > 0 && a[ctr] == 'r' && ismodified) {
-				ismodified = false;
-				continue;
-			}
-			ctr++;
+	//sort num in range of 1-10 - simpler version , would not work for non integer/complex data as indices are assumed = data
+	//can be used for sorting string
+	public static void countSortAlt(int[] a) {
+		int[] idx = new int[10];
+		for(int v : a) {
+			idx[v]++;
 		}
-		System.out.println(new String(a));
+		int finalidx = 0;
+		for(int k=0;k<idx.length;k++) {
+			int freq = idx[k];
+			while(freq > 0) {
+				a[finalidx++] = k;
+				freq--;
+			}
+		}
+		MaxHeap.printArray(a);
 	}
 	
-	static int getRidx(char[] a, int start) {
-		int i = start;
-		while(i<a.length - 1 && a[i] == 'r') { i++; }
-		return i;
+	
+	// sort in O(n), letters between 'a'<= char <= 'z'
+	public static void sort()
+	{
+		String input = "bookdfdgd";
+	    char[] a = input.toCharArray();
+	    int[] ab = new int[256]; //26
+	    char[] result = new char[a.length];
+	    for(int i=0; i<a.length; i++) {
+	        char c = a[i];
+	        ab[(int)c]++;
+	    }
+	    for(int i=1; i<ab.length; i++) {
+	        ab[i] = (ab[i] + ab[i-1]);
+	    }
+	    for(int i=0; i<a.length; i++)  {        
+	        result[--ab[a[i]]] = a[i]; 
+	    }
+	    String res = String.valueOf(result); 
+	    System.out.println(res);
 	}
 	
-	static int getBidx(char[] a, int end) {
-		int i = end;
-		while(i>0 && a[i] == 'b') { i--; }
+	public static void lsdRadixSort(){
+		String[] a = {"AFG",
+				"ALB",
+				"DZA",
+				"ASM",
+				"AND",
+				"BLZ",				
+				"BMU",
+				"AIA",
+				"BEN"
+		};
 
-		return i;
+		String [] ra = new String[a.length];
+		String[] prevra = a;
+		for(int j=2; j>=0; j--) {
+			int[] k = new int[256];
+			char[] pa = new char[a.length];
+			for(int i = 0; i<a.length; i++) {
+				String is = a[i];
+				pa[i] = is.charAt(j);
+			}
+			for(int i=0; i<pa.length; i++) {
+				k[pa[i]]++;
+			}
+			for(int i=1; i<k.length; i++) {
+				k[i] = k[i] + k[i-1];
+			}
+			//char[] result = new char[pa.length];
+			for(int i=pa.length-1; i>=0; i--) {
+				ra[--k[pa[i]]] = prevra[i];
+			}
+			for(int i=0; i<ra.length; i++) {
+				prevra[i] = ra[i];
+			}
+		}
+		for(String s : ra) {
+			System.out.println(s);
+		}
+
 	}
 	
 	public static void sort3Values2()
 	{
-		int[] a = {1,0,2,1,0};
+		int[] a = {0,1,0,0,1,2,0,0};
 		int lo = 0;
 		int mid = 0;
 		int hi = a.length-1;
-		while(mid < hi) {
+		while(mid <= hi) {
 			if(a[mid] == 0) {
 				swap(a, lo, mid);
 				lo++;
@@ -303,8 +356,272 @@ public class Sort {
 		a[r] = tmp;
 		return j;
 	}
+
+	
+	public static void shellSort(int[] a) {
+		//shell sort is similar to optimized insertion sort. Complexity for this method is proportional to N3/2
+		//h sequence is chosen to be H*3 + 1
+		a = new int[]{8,11,0,43,62,13,7,18};
+		int N = a.length;
+		int h = 1;
+		while(h < N/3) {
+			h = h*3+1;
+		}
+		while(h >= 1) {
+			for(int i = h; i<N; i++) {
+				int j = i;
+				while(j >= h && a[j-h] > a[j]) {
+					int t = a[j-h];
+					a[j-h] = a[j];
+					a[j] = t;
+					j -= h;
+				}
+			}
+			h = h/3;
+		}MaxHeap.printArray(a);
+	}
+	
+	public static void insertionSortSentinel() {
+		int[] a = {3,5,0,2,0,9};
+		//move smallest element to its position and then insertion sort, removing the bounds check.
+		if(a.length < 2) { return; }
+		int minidx = 0;
+		for(int i=0; i<a.length; i++) {
+			if(a[i] < a[minidx]) {
+				minidx = i;
+			}
+		}
+		swap(a, minidx, 0);
+		MaxHeap.printArray(a);
+
+		for(int i = 1; i<a.length; i++) {
+			int j = i;
+			while(a[j-1] > a[j]) {
+				swap(a, j-1, j);
+				j--;
+			}
+		}
+		System.out.println("ins--sentinel");
+		MaxHeap.printArray(a);
+	}
+	
+	public static void insertionSortNoSwap() {
+		int[] a = {2,0,2,2,0,2};
+
+		for(int i = 1; i<a.length; i++) {
+			int j = i;
+			int tmp = a[j];
+			while(j > 0 && a[j-1] > tmp ) {
+					a[j] = a[j-1];
+					j--;
+			}
+			a[j] = tmp;
+		}
+		System.out.println("ins--no swap");
+		MaxHeap.printArray(a);
+	}
+	
+	public static void mergeSortBU() {
+		int[] a = {20,12,15,29,23,17,22,21,40,26,51};
+		//int N = 100000;
+		//int[] a = getRandomArray(N);
+
+		long startNanos = System.nanoTime();
+		int sz = 1;
+		while(sz < a.length) {
+			for(int i=0; i<a.length-sz; i += sz+sz) {
+				mergeBU(a, i, i+sz-1, Math.min(i+sz+sz-1, a.length-1));
+			}
+			sz += sz;
+		}
+		long endNanos = System.nanoTime();
+		System.out.println("time taken "+(endNanos-startNanos)/1000+"us");
+	}
+	
+	public static void mergeBU(int[] a, int l, int m, int r) {
+		int[] L = new int[m-l+2];
+		int[] R = new int[r-m+1];
+		L[L.length-1] = Integer.MAX_VALUE;
+		R[R.length-1] = Integer.MAX_VALUE;
+		for(int p=0; p<L.length-1; p++) {
+			L[p] = a[l+p];
+		}
+		for(int q=0; q<R.length-1; q++) {
+			R[q] = a[m+q+1];
+		}
+		int k = l, i=0, j=0;
+		while(k <= r) {
+			if(L[i] <= R[j]) {
+				a[k] = L[i];
+				i++;
+			} else {
+				a[k] = R[j];
+				j++;
+			}
+			k++;
+		}
+	}
+	
+	public static void optimizedMergeBU(int[] a, int l, int m, int r) {
+		if(r-l <= 27) {
+			//insertionsort
+			for(int i=l+1; i<=r; i++) {
+				int j = i;
+				int tmp = a[j];
+				while(j > l && a[j-1] > tmp) {
+					a[j] = a[j-1];
+					j--;
+				}
+				a[j] = tmp;
+			}
+			//System.out.println("insertion sorted ");
+			//MaxHeap.printArray(a);
+			return;
+		}
+/*		if((a[m] < a[m+1] && a[l] < a[m+1]) 
+				|| (a[l] > a[m+1] && a[l] > a[r])) {
+			//subarrays already sorted
+			//System.out.println("returning "+a[l]+" "+a[m]+" "+ a[Math.min(m+1,r)]+" "+a[r]);
+			return;
+		}*/
+		int[] L = new int[m-l+2];
+		int[] R = new int[r-m+1];
+		L[L.length-1] = Integer.MAX_VALUE;
+		R[R.length-1] = Integer.MAX_VALUE;
+		for(int p=0; p<L.length-1; p++) {
+			L[p] = a[l+p];
+		}
+		for(int q=0; q<R.length-1; q++) {
+			R[q] = a[m+q+1];
+		}
+		int k = l, i=0, j=0;
+		while(k <= r) {
+			if(L[i] <= R[j]) {
+				a[k] = L[i];
+				i++;
+			} else {
+				a[k] = R[j];
+				j++;
+			}
+			k++;
+		}
+		//MaxHeap.printArray(a);
+
+	}
+	
+	public static int[] getRandomArray(int N) {
+		int[] a = new int[N];
+		Random rdm = new Random();
+		for(int i=0; i<N; i++) {
+			a[i] = rdm.nextInt(N*2);
+		}
+		return a;
+	}
+	
+	public static void findMedian() {
+		
+		int[] a = {32,4};
+		int l = a.length;
+		int med = -1;
+		
+		if(l%2==0){
+			int m1 = kthlargestR(a, l/2-1, 0 , a.length-1);
+			int m2 = kthlargestR(a, l/2, 0 , a.length-1);
+			med = (m1+m2)/2;
+		}else{
+			med = kthlargestR(a, l/2, 0 , a.length-1);
+		}
+		MaxHeap.printArray(a);
+		System.out.println("median = "+med);
+	}
+	
+	public static int kthlargestR(int[] a, int k, int l, int r) {
+		if(l <= r) {
+			int p = partitionmed(a, l, r);
+			if(k==p) {
+				return a[p];
+			}else if(k < p){
+				return kthlargestR(a, k, l, p-1);
+			}else {
+				return kthlargestR(a, k, p+1, r);
+			}
+		}
+		return -1;
+	}
+
+	public static int partitionmed(int[] a, int l, int r) {
+		int pivot = a[r];
+		int j = l;
+		for(int i=l; i<r; i++) {
+			if(a[i] < pivot) {
+				int t = a[j];
+				a[j] = a[i];
+				a[i] = t;
+				j++;
+			}
+		}
+		a[r] = a[j];
+		a[j] = pivot;
+		return j;
+		
+	}
+	
+	public static void findKNearest(){
+		int K=4, X=45;
+		int[] a = {12,16,22,30,35,39,42,45,45,50,53,55,56};
+		int l = 0;
+		int r = a.length-1;
+		int L = a.length;
+		int idx = -1;
+		int[] c = new int[K];
+		while(l <= r) {
+			int mid = l + (r-l)/2;
+			if(X < a[mid] ){
+				r = mid - 1;
+			}else if(X > a[mid]){
+				l = mid+1;
+			}else{
+				idx = mid;
+				break;
+			}
+		}
+		int ct = 0;
+		int ll = r;
+		int rr = l;
+		if(idx != -1){
+			ll = idx - 1;
+			rr = idx + 1;
+			c[c.length-1] = a[idx];
+			K--;
+		}else{
+			ll = r;
+			rr = l;
+		}
+		while(ct < K){
+			if(ll >= 0 && ll < L && rr < L && rr >= 0) {
+				if(Math.abs(X-a[ll]) < Math.abs(X-a[rr])) {
+					c[ct++] = a[ll--];
+				}else if(Math.abs(X-a[ll]) > Math.abs(X-a[rr])) {
+					c[ct++] = a[rr++];
+				}else{
+					c[ct++] = a[ll--];
+					c[ct++] = a[rr++];
+				}
+			}else if (ll < 0 && rr < L){
+				c[ct++] = a[rr];
+				rr++;				
+			}else if (ll >= 0 && rr >= L && ll < L){
+				c[ct++] = a[ll];
+				ll--;				
+			}
+		}
+		MaxHeap.printArray(c);
+	}
 	
 	public static void main(String[] args) {
+		int[] a = {4,3,5,6,5,4,8,2,4,3};
+		
+
 		int[] arr = {12,20,15,29,23,17,22,21,40,26,51,19};
 		//int[] arr = { 5, 1, 20, 34, 8 };
 		//bubbleSort(arr);
@@ -321,8 +638,17 @@ public class Sort {
 		System.out.println("kth largest "+value);
 		//insertionSort(arr);
 		countSort();
-		sort3values();
 		sort3Values2();
 		sortStrings(new String[]{"algo","galo","altus","sell", "belt"});
+		selectionSort(a);
+		shellSort(a);
+		insertionSortSentinel();
+		insertionSortNoSwap();
+		mergeSortBU();
+		countSortAlt(a);
+		lsdRadixSort();
+		sort();
+		findMedian();
+		findKNearest();
 	}
 }

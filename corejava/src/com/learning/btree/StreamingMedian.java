@@ -19,36 +19,36 @@ public class StreamingMedian {
 	
 	int median = 0;
 	
-	private PriorityQueue<Integer> bottomQ;
+	private PriorityQueue<Integer> maxPQ;
 	
-	private PriorityQueue<Integer> topQ;	
+	private PriorityQueue<Integer> minPQ;	
 	
 	public StreamingMedian() {
-		bottomQ = new PriorityQueue<>(10, new MaxComp()); //max PQ
-		topQ = new PriorityQueue<>(); //min PQ
+		maxPQ = new PriorityQueue<>(10, Comparator.reverseOrder()); //max PQ - holds values less than median
+		minPQ = new PriorityQueue<>(); //min PQ - holds values > median
 	}
 	
 	public void addNumber(int n) {
 		if(n > median) {
-			topQ.add(n);
+			minPQ.add(n);
 		} else if(n <= median) {
-			bottomQ.add(n);
+			maxPQ.add(n);
 		}
-		if(topQ.size() > bottomQ.size()+1) {
-			bottomQ.add(topQ.poll());
+		if(minPQ.size() > maxPQ.size()+1) {
+			maxPQ.add(minPQ.poll());
 		}
-		else if(bottomQ.size() > topQ.size()+1) {
-			topQ.add(bottomQ.poll());
+		else if(maxPQ.size() > minPQ.size()+1) {
+			minPQ.add(maxPQ.poll());
 		}
-		int topSize = topQ.size();
-		int bottomSize = bottomQ.size();
+		int topSize = minPQ.size();
+		int bottomSize = maxPQ.size();
 		if(topSize > bottomSize) {
-			median = topQ.peek();
+			median = minPQ.peek();
 		} else if(bottomSize > topSize) {
-			median = bottomQ.peek();
+			median = maxPQ.peek();
 		} else {
 			if(topSize > 0 && bottomSize > 0) {
-				median = (topQ.peek()+bottomQ.peek())/2;
+				median = (minPQ.peek()+maxPQ.peek())/2;
 			} 
 		}
 	}

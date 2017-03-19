@@ -86,56 +86,45 @@ public class LinkedListTemp {
 		head = tnode;
 	}
 	
-	public void printSpiral(){
-		int[][] a = {{1,2,3,4,21},{5,6,7,8,22},{9,10,11,12,23},{13,14,15,16,24},{31,34,38,39,41}};
-		int level = 0;
-		int n = a[0].length;
-		int r = 0;
-		int c = 0;
-		while(n > r) {			
-			while(c < n) {
-				System.out.println(a[r][c]);
-				c++;
+	public void removeZeroSums() {
+		ListNode temp = head;
+		ListNode skipStart = null;
+		int currSum = 0;
+		while(temp != null) {
+			currSum += temp.v;
+			if(currSum == 0) {
+				if(skipStart == null) {
+					head = temp.next;
+					skipStart = head;
+				} else {
+					skipStart.next = temp.next;
+				}
+				skipStart = temp.next;
+			} if(temp.v < 0 && currSum > 0) {
+				if(skipStart == null) skipStart = head;
+				temp = skipStart.next;
+				currSum = 0;
+				skipStart = temp;
+			} else { 
+				temp = temp.next;
 			}
-			c--;
-			r++;
-			while(r < n) {
-				System.out.println(a[r][c]);
-				r++;			
-			}
-			r--;
-			c--;
-			while(c >= level) {
-				System.out.println(a[r][c]);
-				c--;
-			}
-			c++;
-			r--;
-			while(r >= level) {
-				System.out.println(a[r][c]);
-				r--;
-			}
-			n--;
-			r+=2;
-			c++;
-			level++;
 		}
 	}
 	
 	public static void main(String[] args) {
 		LinkedListTemp ll = new LinkedListTemp();
-		ll.addNode(2)
-		.addNode(5)
+		ll.addNode(1)
+		.addNode(6)
+		.addNode(-6)
+		.addNode(8)
+		.addNode(2)
+		.addNode(-2)
+		.addNode(16)
 		.addNode(7)
-		.addNode(89)
-		.addNode(23)
-		.addNode(65);
-		ll.deletenode(23);
+		.addNode(-23);
 		ll.printList();
-		ll.kthFromLast(4);
-		ll.reverseList();
+		ll.removeZeroSums();
 		ll.printList();
-		ll.printSpiral();
 	}
 
 }

@@ -1,5 +1,9 @@
 package com.learning.btree;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Dynamic {
 	
 	
@@ -19,20 +23,35 @@ public class Dynamic {
 	}
 	
 	public static int knapsackDynamic() {
-		int MAXWT = 7;
-		int[] weights = {1, 6, 2,3};
-		int[] values = {102, 185, 92, 87};
+		int W = 5;
+		int[] weights = {1, 4, 2,3};
+		int[] values = {102, 205, 92, 87};
 		int n = weights.length;
 
-		int[][] table = new int[n+1][MAXWT+1];
+/*		int[][] table = new int[n+1][MAXWT+1];
 		for(int i=0; i<=n; i++) {
 			for(int j=0; j<=MAXWT; j++) {
 				if(i==0 || j==0) {
 					table[i][j] = 0;
 				} else if(weights[i-1] <= j) {
 					table[i][j] = Math.max(values[i-1] + table[i-1][j-weights[i-1]], table[i-1][j]);
+					//table[i][j] = values[i-1] + table[i-1][j];
 				} else {
 					table[i][j] = table[i-1][j];
+				}
+			}
+		}*/
+		int [][]table = new int[n+1][W+1];
+		for(int i=0; i<n+1; i++) {
+			for(int j=0; j<W+1; j++) {
+				if(i == 0 || j == 0) {
+					table[i][j] = 0;
+				}else if(weights[i-1] > j) {
+					table[i][j] = table[i-1][j];
+				}else{
+					int lv = table[i-1][j];
+					int nv = values[i-1] + table[i-1][j-weights[i-1]];
+					table[i][j] = Math.max(lv,  nv);
 				}
 			}
 		}
@@ -44,8 +63,8 @@ public class Dynamic {
 			}
 			System.out.println(sb);
 		}
-		System.out.println("max knapsack "+table[n][MAXWT]);
-		return table[n][MAXWT];
+		System.out.println("max knapsack "+table[n][W]);
+		return table[n][W];
 	}
 	
 	public static void memoizedFibonacci() {
@@ -164,31 +183,51 @@ public class Dynamic {
 		return finalSol;
 	}
 	
-	public static int findMinCoinsDynamic(int amt, int[] denom) {
+	public static int findMinCoinsDynamic() {
+		int amt = 6;
+		int[] denom = {1,2,3};
 		int[] mincoins = new int[denom.length];
 		int[] table = new int[amt+1];
+		int m = denom.length;
 
 		table[0] = 0;
+		for(int i=1; i<=amt; i++) {
+			table[i] = Integer.MAX_VALUE;
+		}
+		// Compute minimum coins required for all
+	    // values from 1 to amt
 		for(int k=1; k <=amt; k++) {
-			for(int i=0; i<denom.length; i++) {
-				mincoins[i] = -1;
-			}
-			for(int i=0; i<denom.length; i++) {
-				if(k >= denom[i]) {
-					mincoins[i] = table[k-denom[i]] + 1;
-				}
-			}
-			table[k] = -1;
-			for(int i=0; i<denom.length; i++) {
-				if(mincoins[i] > 0) {
-					if(table[k] == -1 || table[k] > mincoins[i] ) {
-						table[k] = mincoins[i];
+			//go through all coins less than i
+			for(int j = 0; j<m; j++) {
+				if(denom[j] <= k) {
+					int sub_res = table[k-denom[j]];
+					if(sub_res != Integer.MAX_VALUE && (sub_res + 1) < table[k]) {
+						table[k] = sub_res + 1;
 					}
 				}
 			}
+
 		}
 
 		return table[amt];
+	}
+	
+	public static void totalWaysToMakeChange(){
+		int[] s = {1,2,3};
+		int n = 6;
+		int m = 3;
+		int[][] table = new int[n+1][m];
+		for(int j=0; j<m; j++) {
+			table[0][j] = 1;
+		}
+		for(int i=1; i<n+1; i++) {
+			for(int j = 0; j<m; j++) {
+				int x = i-s[j] >= 0 ? table[i-s[j]][j] : 0;
+				int y = j >= 1 ? table[i][j-1] : 0;
+				table[i][j] = x+y;
+			}
+		}
+		System.out.println("ways for change "+table[n][m-1]);
 	}
 	
 	public static void findCoinsDriver() {
@@ -208,7 +247,7 @@ public class Dynamic {
 	}
 	
 	public static void editDistance() {
-		String a = "samen";
+		String a = "amen";
 		String b = "sarc";
 		int M = a.length();
 		int N = b.length();
@@ -236,15 +275,149 @@ public class Dynamic {
 		System.out.println("min edit "+table[M][N]);
 	}
 	
+	public static void minCost(){
+		int[][] c = {
+				{1,2,3},
+				{4,8,2},
+				{1,5,3}
+		};
+		//cost[i][j] = min(c[i-1,j],c[i,j-1],c[i-1,j-1])
+		/*
+		 * {
+		 * {1,3,6
+		 * {5,9,5
+		 * {6,10,8
+		 */
+		int M = c.length;
+		int[][] res = new int[M][M];
+		for(int i=0; i<M; i++) {
+			for(int j=0; j<M; j++) {
+				if(i==0 && j==0) {
+					res[i][j] = c[i][j];
+				}else if(i==0 && j > 0) {
+					res[i][j] = res[i][j-1] + c[i][j];
+				}else if(j==0 && i>0) {
+					res[i][j] = c[i][j] + res[i-1][j];
+				}else {
+					int c1 = res[i-1][j-1];
+					int c2 = res[i][j-1];
+					int c3 = res[i-1][j];
+					res[i][j] = c[i][j] + Math.min(Math.min(c1, c2), c3); 
+				}
+			}
+		}
+		MaxHeap.printArray(res);
+	}
+	
+	public static void binomial() {
+		int n = 6;
+		int k = 4;
+		int[][] table = new int[k+1][n+1];
+		for(int j=0; j<=n; j++) {
+			table[0][j] = 1;
+		}
+		for(int i=1; i<=k; i++) {
+			for(int j=i; j<=n; j++) {
+				table[i][j] = table[i-1][j-1]+table[i][j-1];
+			}
+		}
+		System.out.println("binomial is "+table[k][n]);
+	}
+	
+	public static void cutRod() {
+		//rod of lenght = 5 ans price of each unit
+		int[] price = {1,5,8,9,13};
+		int N = price.length;
+		int[] val = new int[N+1];
+		val[0] = 0;
+		for(int i=1; i<=N; i++) {
+			int max = Integer.MIN_VALUE;
+			for(int j=0; j<i; j++) {
+				max = Math.max(max, price[j]+val[i-j-1]);
+			}
+			val[i] = max;
+		}
+		System.out.println("max val "+val[N]);
+	}
+	
+	//total ways to climb stairs when allowed to make 1 to m hops for a H stair building
+	public static void countWays() {
+		//ways to climb up 7 stories if 1 to 3 steps can be taken.
+		//int ways = countWaysUtil(7, 3);
+		int ways = countWaysUtilDp(7, 3);
+		System.out.println("ways "+ways);
+	}
+	
+	public static int countWaysUtilDp(int H, int m) {
+		int[] res = new int[H];
+		res[0] = 1;
+		res[1] = 1;
+		for(int i=2; i<H; i++) {
+			res[i] = 0;
+			for(int j=1; j<=m && j<=i; j++) {
+				res[i] += res[i-j];
+			}
+		}
+		return res[H-1];
+	}
+	
+	public static int countWaysUtil(int H, int m) {
+		//ways(H,m) = ways(H-1)+..ways(H-m)
+		if(H <= 1) {
+			return H;
+		}
+		int ret = 0;
+		for(int i=1; i<=m && i<=H; i++ ) {
+			ret += countWaysUtil(H-i, m);
+		}
+		return ret;
+	}
+	
+	public static void eggDrop() {
+		//n eggs and k floors, minimize the number of trials
+		//if egg is dropped from a floor x it can break or not break
+		//if breaks problem reduces to x-1 and n-1
+		//if doesn't break problem reduces to k-x and n
+		//eggDrop(n, k) = 1 + min(max(eggDrop(n-1, x-1), eggDrop(n, k-x)))
+		int trials = eggDrop(2, 100);
+		System.out.println("trials for "+trials);
+	}
+	
+	public static int eggDrop(int n, int k) {
+		//int val = 1 + Math.min(Math.max(eggDrop(n-1, x-1, k), eggDrop(n, k-x, k)));
+		if(k == 0 || k==1) {
+			return k;
+		}
+		if(n==1) {
+			return k;
+		}
+		int res = 0;
+		int min = Integer.MAX_VALUE;
+		int x;
+		for(x=1; x<=k; x++) {
+			res = 1+Math.max(eggDrop(n-1, x-1), eggDrop(n, k-x));
+			if(res < min)min = res;
+		}
+		return min+1;
+	}
+	
+
+	
 	public static void main(String[] args) {
 		knapRecursive();
 knapsackDynamic();
 memoizedFibonacci();
 		findMaxIncreasingSubseq();
 		findCoinsDriver();
-		System.out.println(findMinCoinsDynamic(18, new int[]{5,2,1}));
+		System.out.println("min coins "+findMinCoinsDynamic());
 		lcsDynamic("AXYT", "AYZXT");
 		editDistance();
+		minCost();
+		totalWaysToMakeChange();
+		binomial();
+		cutRod();
+		countWays();
+		eggDrop();
 	}
 
 }

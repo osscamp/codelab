@@ -68,6 +68,7 @@ public class JavaBasics {
 
 		char prev = ' ';
 		int si = 0;
+		int end = 0;
 		for(int i=0; i<arr.length; i++) {
 			char cc = arr[i];
 			//tset dns yrt
@@ -80,9 +81,15 @@ public class JavaBasics {
 			else if(i==arr.length-1) {
 				reverseByArray(arr, si, i);
 			}
+/*			if(cc != ' ' && prev == ' ') {
+				si = i;
+			} else if((cc == ' ' && prev != ' ') || (i==arr.length-1)) {
+				int ri = (i==arr.length-1) ? i : i-1;
+				reverseByArray(arr, si, ri);
+			}*/
 			prev = cc;
 		}
-		System.out.println("reversed "+String.valueOf(arr));
+		System.out.println("reversed:"+String.valueOf(arr));
 	}
 	
 	public static long fact(int n) {
@@ -111,6 +118,22 @@ public class JavaBasics {
 		}
 	}
 	
+	//square root
+	public static void sqrt2() {
+		double n = 10.0;
+		double precision = 1e-5;
+		double est = n;
+		while(est*est - n > precision*est*est ) {
+			est = (n/est + est)/2.0;
+		}
+		System.out.println("sqrt "+est);
+		//sq root formula
+		//x2 = (1/2)(x1 + N/x1)
+		
+		//cube root formula
+		//x2 = (1/3)(2*x1 + N/x1*x1);
+	}
+	
 	public static void fibonacci(int n) {
 		int prev1 = 0;
 		int prev = 1;
@@ -122,6 +145,8 @@ public class JavaBasics {
 		}
 	}
 	
+	//ways to reach top if 1 or 2 steps are allowed at a time.
+	//it is the nth fibonacci number.
 	public static void countStairs(int n) {
 		int[] ctr = new int[n];
 		ctr[0] = 1;
@@ -278,22 +303,18 @@ public class JavaBasics {
 		if(str == null || str.length() == 0) {
 			return false;
 		}
-		int ctr = 0;
-		boolean decimal = false;
-		for(char ch: str.toCharArray()) {
-			if(ctr == 0 && (ch == '+' || ch == '-')) {
+		boolean decOccurred = false;
+		for(int i=0; i<str.length(); i++) {
+			char c = str.charAt(i);
+			if(i == 0 && (c=='-' || c=='+')) {
 				continue;
+			}else if(c == '.' && !decOccurred) {
+				decOccurred = true;
+				continue;
+			}else if(c-'0' < 0 || c-'0' > 9) {
+				isNumeric = false;
+				break;
 			}
-			if(ch-'0' < 0 || ch-'0' > 9) {
-				if(ch != '.' ) {
-					return false;
-				} else if(!decimal && ch == '.'){
-					decimal = true;
-				} else {
-					return false;
-				}
-			} 
-			ctr++;
 		}
 		return isNumeric;
 	}
@@ -333,24 +354,6 @@ public class JavaBasics {
 			}
 		}
 		System.out.println("maxones at "+maxonesidx);
-	}
-	
-	public static String convertToHex(int number) {
-		number--;
-		int rem = number % 26;
-		String result = "";	
-		if(number - rem == 0) {
-			result = ""+toChar(rem);
-		} else {
-			result = convertToHex((number-rem)/26)+toChar(rem);
-		}
-		System.out.println("16 result "+result);
-		return result;
-	}
-	
-	public static char toChar(int n){
-		char[] a= "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-		return a[n];
 	}
 	
 	//doesn't work
@@ -448,6 +451,31 @@ public class JavaBasics {
 		}
 	}
 	
+	public static String convertToHex(int number) {
+		int rem = number % 26;
+		String result = "";	
+		if(number - rem == 0) {
+			result = ""+toChar(rem);
+		} else {
+			result = convertToHex((number-rem)/26)+toChar(rem);
+		}
+		return result;
+	}
+	
+	public static String convertToHexalt(int N) {
+		if(N <= 26) {
+			return ""+toChar(N);
+		}else{
+			return convertToHexalt(N/26) + toChar(N%26);
+		}
+	}
+	
+	
+	public static char toChar(int n){
+		char[] a= "0ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+		return a[n];
+	}
+	
 	public static String intToBin(int N) {
 		if(N <= 1) {
 			return "1";
@@ -457,19 +485,19 @@ public class JavaBasics {
 	}
 	
 	public static void countwords() {
-		String s = "at    ";
+		String s = " at all";
 		int count = 0;
 		int length = s.length()-1;
 		char prev = ' ';
 
-		for(int i=length; i>=0; i--) {
+		for(int i=0; i<s.length(); i++) {
 			char c = s.charAt(i);
 			if(c != prev && prev == ' ') {
 				count++;
 			}
 			prev = c;
 		}
-		System.out.println(count);
+		System.out.println("WWWC "+count);
 	}
 	
 	public static void countwords1() {
@@ -556,7 +584,7 @@ public class JavaBasics {
 		replaceSpaces("space string");
 		printTriangle(4);
 		
-		String s = "I am student a b c";
+		String s = "         I am  new";
 		reverseWordsWithoutSplit(s);
 		hanoi(3, 1, 3, 2);
 		//System.out.println(hanoi);
@@ -570,7 +598,8 @@ public class JavaBasics {
 		ilist.add(3);
 		System.out.println(permuteInts(ilist));
 		System.out.println("power "+power(2, 8));
-		convertToHex(31);
+		System.out.println("hex1 "+convertToHex(27));
+		System.out.println("hex2 "+convertToHexalt(27));
 		findInMatrix();
 		mergeArraysRemovingCommon();
 		System.out.println("gcd "+gcd(49, 21));
@@ -606,6 +635,7 @@ public class JavaBasics {
 		  System.out.println(rdm.nextInt(5-3+1)+3);
 		  countStairs(10);
 		  sumWithoutPlusOp(45, 5);
+		  sqrt2();
 
 	}
 	

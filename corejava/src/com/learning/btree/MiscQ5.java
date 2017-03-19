@@ -1,6 +1,7 @@
 package com.learning.btree;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,7 @@ public class MiscQ5 {
 		int j = 0;
 		Random rdm = new Random();
 		for(int i=k; i<a.length; i++) {
-			j = rdm.nextInt(i);
+			j = rdm.nextInt(i+1);
 			System.out.println("random j "+j);
 			if(j < k) {
 				res[j] = a[i];
@@ -113,29 +114,108 @@ public class MiscQ5 {
 		MaxHeap.printArray(res);
 	}
 	
-	public static void convertRoman() {
-		Map<Character, Integer> nmap = new HashMap<>();
-		nmap.put('M', 1000);
-		nmap.put('D', 500);
-		nmap.put('C', 100);
-		nmap.put('L', 50);
-		nmap.put('X', 10);
-		nmap.put('V', 5);
-		nmap.put('I', 1);
-		String roman = "MCMLXXXVI";
-		char prev = Character.MIN_VALUE;
-		int total = 0;
-		for(int i=roman.length() - 1; i>=0; i--) {
-			char a = roman.charAt(i);
-			int val = nmap.get(a);
-			if(prev != Character.MIN_VALUE && val < nmap.get(prev)) {
-				total -= val;
-			} else {
-				total += val;
-			}
-			prev = a;
+	public static void reservoirSamplingIndex() {
+		int[] a = {2,5,3,1,7};
+		int k = 1;
+		int[] res = new int[k];
+		for(int i=0; i<k; i++) {
+			res[i] = i;
 		}
-		System.out.println(total);
+		int j = 0;
+		Random rdm = new Random();
+		for(int i=k; i<a.length; i++) {
+			j = rdm.nextInt(i+1);
+			System.out.println("random j "+j);
+			if(j < k) {
+				res[j] = i;
+			}
+		}
+		System.out.println("reservoir idx");
+		MaxHeap.printArray(res);
+	}
+	
+	public static void reservoirSamplingBitset() {
+		long start = System.nanoTime();
+		int totalSize = 4000000;
+		BitSet b = new BitSet(totalSize);
+		int i=0;
+		int k = 2000000;
+		int[] res = new int[k];
+		for(; i<k; i++) {
+			res[i] = i;
+			b.set(i);
+		}
+		int j = 0;
+		Random rdm = new Random();
+		int compares = 0;
+		for(; i<totalSize; i++) {
+			j = rdm.nextInt(i+1);
+			compares++;
+			if(j < k) {
+				b.clear(res[j]);
+				b.set(i);
+				res[j] = i;
+			}
+		}
+
+/*		for(int p=0; p<totalSize; p++) {
+			if(b.get(p)) {
+				//System.out.println("set bit "+p);
+			}
+		}*/
+		long end = System.nanoTime();
+		System.out.println("compares 1 "+compares+" micros "+(end-start)/1000);
+	}
+	
+	public static void reservoirSamplingNewBitset() {
+		long start = System.nanoTime();
+		int totalSize = 4000000;
+		BitSet randomBitSet = new BitSet();
+		Random randomGenerator = new Random();
+		int i = 0;
+		int compares = 0;
+
+		while(i < 2000000) {
+			int ridx = randomGenerator.nextInt(totalSize);
+			if(randomBitSet.get(ridx)) {
+				compares++;
+				continue;
+			}
+			randomBitSet.set(ridx);
+			compares++;
+			i++;
+		}
+
+/*		for(int p=0; p<totalSize; p++) {
+			if(randomBitSet.get(p)) {
+				//System.out.println("set bit new "+p);
+			}
+		}*/
+		long end = System.nanoTime();
+		System.out.println("compares 2 "+compares+" micros "+(end-start)/1000+" card "+randomBitSet.cardinality());
+	}
+	
+	public static void convertRoman() {
+		Map<Character, Integer> vals = new HashMap<>();
+		vals.put('I', 1);
+		vals.put('V', 5);
+		vals.put('X', 10);
+		vals.put('L', 50);
+		vals.put('C', 100);
+		String roman = "LXXXVII";
+		int number = 0;
+		int pnum = 0;
+		for(int i=roman.length()-1; i>=0; i--) {
+			char rom = roman.charAt(i);
+			int romv = vals.get(rom);
+			if(romv >= pnum) {
+				number += romv;
+			}else {
+				number -= romv;
+			}
+			pnum = romv;
+		}
+		System.out.println("Decimal is "+number);
 	}
 	
 	public static void flatten() {
@@ -232,6 +312,8 @@ public class MiscQ5 {
 		convertRoman();
 		flatten();
 		isContinuousSubSeqSumPresent();
+		reservoirSamplingBitset();
+		reservoirSamplingNewBitset();
 		//sumMinSubArray();
 	}
 

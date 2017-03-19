@@ -105,8 +105,8 @@ public class MiscQ2 {
 	
 	public static void findCommon() {
 		char[] c1 = {'a','g','h','k','a','z','g','k','l','r'};
-		char[] c2 = {'z','f','g','h','a','k','o','r'};
-		char[] c3 = {'q','w','e','m','n','a','a','r','k','z'};
+		char[] c2 = {'z','f','g','h','a','k','o','r','l'};
+		char[] c3 = {'q','w','e','m','n','a','a','r','z'};
 		numberOfCommonChars(new String[]{String.valueOf(c1),String.valueOf(c2),String.valueOf(c3)});
 	}
 	
@@ -128,6 +128,7 @@ public class MiscQ2 {
 		}		
 		for(char k='a'; k <= 'z'; k++) {
 			if(current.get(k)) {
+				System.out.println("number common "+k);
 				commonall++;
 			}
 		}
@@ -223,7 +224,7 @@ public class MiscQ2 {
 	
 	public static void wordWrap() {
 		String s = "His    grip strength and right leg are improving. The left leg is improving but more slowly. He can speak, eat, etc.";
-		int wrap = 10;
+		int wrap = 15;
 		s = s.trim();
 		StringBuilder sb = new StringBuilder();
 		List<Integer> wordB = new ArrayList<Integer>();

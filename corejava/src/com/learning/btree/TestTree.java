@@ -3,7 +3,11 @@ package com.learning.btree;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
+
+
+
 
 
 public class TestTree {
@@ -23,13 +27,13 @@ public class TestTree {
 			return String.valueOf(v);
 		}
 		
-		public StringBuilder prettyPrintSO(StringBuilder prefix, boolean isTail, StringBuilder sb) {
+		public StringBuilder prettyPrintSO(StringBuilder prefix, boolean isLeaf, StringBuilder sb) {
 		    if(right!=null) {
-		        right.prettyPrintSO(new StringBuilder().append(prefix).append(isTail ? "│   " : "    "), left == null, sb);
+		        right.prettyPrintSO(new StringBuilder().append(prefix).append(isLeaf ? "│   " : "    "), left == null, sb);
 		    }
-		    sb.append(prefix).append(isTail ? "└── " : "┌── ").append(v).append("\n");
+		    sb.append(prefix).append(isLeaf ? "└── " : "┌── ").append(v).append("\n");
 		    if(left!=null) {
-		        left.prettyPrintSO(new StringBuilder().append(prefix).append(isTail ? "    " : "│   "), true, sb);
+		        left.prettyPrintSO(new StringBuilder().append(prefix).append(isLeaf ? "    " : "│   "), true, sb);
 		    }
 		    return sb;
 		}
@@ -91,6 +95,14 @@ public class TestTree {
 		}
 	}
 	
+	public void preOrderPrint(Node n) {
+		if (n != null) {
+			System.out.println(n.v);
+			preOrderPrint(n.left);
+			preOrderPrint(n.right);
+		}
+	}
+	
 	public Node delete(Node n, int vd) {
 		if (n == null) {
 			return null;
@@ -130,40 +142,47 @@ public class TestTree {
 	}
 	
 	public void iterativePreOrder() {
-		Node n = root;
-		if(n == null) { return; }
-		Stack<Node> stack = new Stack<>();
-		stack.push(n);
-		Node prev = null;
-		while(!stack.isEmpty()) {
-			n = stack.peek();
-			if(prev == null || prev.left == n || prev.right == n) {
-				if(n.left != null) {
-					stack.push(n.left);
-				} else if(n.right != null) {
-					stack.push(n.right);
-				} else {
-					stack.pop();
-					System.out.println(n);
+		LinkedList<Node> ll = new LinkedList<>();
+		ll.add(this.root);
+		while(ll.size() >= 1) {
+			Node n = ll.poll();
+			if(n != null) {
+				System.out.println("itr p "+n.v);
+				if(n.right != null) {
+					ll.addFirst(n.right);
 				}
-			} else if(n.left == prev){
-                if(n.right != null){
-                    stack.push(n.right);
-                }else{
-                    stack.pop();
-                    System.out.println(n);
-                }
- 
-            //go up the tree from right node 
-            //after coming back from right node, process parent node and pop stack. 
-            }else if(n.right == prev){
-                stack.pop();
-                System.out.println(n);
-            }
- 
-            prev = n;
+				if(n.left != null) {
+					ll.addFirst(n.left);
+				}
+
+			}
 		}
 
+	}
+	
+	public void iterativePostOrder() {
+		Stack<Node> st = new Stack<>();
+		Node n = root;
+		while(n != null || !st.isEmpty()) {
+			if(n != null) {
+				if(n.right != null) {
+					st.push(n.right);
+				}
+				st.push(n);
+				n = n.left;
+			}else if(!st.isEmpty()) {
+				n = st.pop();
+				if(n.right != null && !st.isEmpty() && n.right==st.peek() ) {
+					st.pop();
+					st.push(n);
+					n = n.right;
+				}else{
+					System.out.println(n);
+					n = null;
+				}
+			}
+		}
+		
 	}
 	
 	public void printBFSIterative() {
@@ -236,31 +255,62 @@ public class TestTree {
 
 	}
 	
-	public void printBFSWithQueue() {
-		java.util.LinkedList<Node> ll = new LinkedList<>();
-		ll.addLast(root);
-		ll.addLast(null);
-		Node in = null;
-		StringBuilder sb = new StringBuilder();
+	public void printBFSWithQueueSimple(){
+		Queue<Node> ll = new LinkedList<>();
+		ll.add(root);
+		int levelnodes = 0;
 		while(!ll.isEmpty()) {
-			if(ll.peekFirst() == null) {
-				if(ll.size() == 1) {
-					break;
+			levelnodes = ll.size();
+			StringBuilder out = new StringBuilder();
+			while(levelnodes > 0) {
+				Node p = ll.poll();
+				out.append(" ").append(p.v);
+				if(p.left != null) {
+					ll.add(p.left);
 				}
-				ll.removeFirst();
-				System.out.println(sb);
-				sb = new StringBuilder();
-				ll.addLast(null);
-				continue;
+				if(p.right != null) {
+					ll.add(p.right);
+				}
+				levelnodes--;
 			}
-			in = ll.pollFirst();
-			sb.append(in.v).append(" ");
-			if(in.left != null) {
-				ll.addLast(in.left);
+			System.out.println(out);
+		}
+	}
+	
+	
+	
+	public void printBFSZigWithQueueSimple(){
+		java.util.LinkedList<Node> ll = new LinkedList<>();
+		ll.add(root);
+		int levelnodes = 0;
+		int loopc = 0;
+		while(!ll.isEmpty()) {
+			levelnodes = ll.size();
+			StringBuilder out = new StringBuilder();
+			boolean lr = (loopc % 2 == 0);
+			while(levelnodes > 0) {
+				Node p = lr ? ll.poll() : ll.pollLast();
+				out.append(" ").append(p.v);
+				if(lr) {
+					if(p.left != null) {
+						ll.add(p.left);
+					}
+					if(p.right != null){
+						ll.add(p.right);
+					}
+				}else{
+					if(p.right != null){
+						ll.addFirst(p.right);
+					}
+					if(p.left != null) {
+						ll.addFirst(p.left);
+					}
+					
+				}
+				levelnodes--;
 			}
-			if(in.right != null) {
-				ll.addLast(in.right);
-			}
+			loopc++;
+			System.out.println(out);
 		}
 	}
 	
@@ -317,6 +367,28 @@ public class TestTree {
 		System.out.println(result);
 	}
 	
+	public void printBFSReverseQueue(Node n) {
+		LinkedList<Node> ll = new LinkedList<>();
+		ll.add(n);
+		while(!ll.isEmpty()) {
+			int sz = ll.size();
+			StringBuilder sb = new StringBuilder();
+			while(sz > 0) {
+				Node nn = ll.pollLast();
+				sb.append(nn.toString()).append(" ");
+				if(nn.right != null) {
+					ll.addFirst(nn.right);
+				}
+				if(nn.left != null) {
+					ll.addFirst(nn.left);
+				}
+				sz--;
+			}
+			System.out.println(sb);
+			sb = new StringBuilder();
+		}
+	}
+	
 	public int heightR(Node n) {
 		if(n == null) {
 			return -1;
@@ -337,8 +409,8 @@ public class TestTree {
 	
 	public boolean isBalanced(Node n) {
 		return n == null || (
-				isBalanced(n.left) &&
-				isBalanced(n.right) &&
+				//isBalanced(n.left) &&
+				//isBalanced(n.right) &&
 				(Math.abs(heightR(n.left) - heightR(n.right)) <= 1)) ;
 
 	}
@@ -373,19 +445,6 @@ public class TestTree {
 
 	}
 
-	public void sortInsertRaw(int[] arr, int l, int r) {
-		int mid = (l + r) / 2;
-		if (l >= mid) {
-			insertNode(root, arr[mid]);
-			return;
-		} else if (r <= mid) {
-			insertNode(root, arr[mid]);
-			// return;
-		}
-		insertNode(root, arr[mid]);
-		sortInsertRaw(arr, l, mid);
-		sortInsertRaw(arr, mid, r);
-	}
 	
 	public Node sortInsert(int[] arr, int l, int r) {
 		if(l <= r) {
@@ -435,7 +494,11 @@ public class TestTree {
 		return newNode;
 	}
 
-	
+	/**
+	 * successor is the lowest ancestor of n whose left child is also an ancestor of n
+	 * @param n
+	 * @return
+	 */
 	public Node findSuccessor(Node n) {
 		if(n == null) {
 			return n;
@@ -584,15 +647,14 @@ public class TestTree {
 		return false;
 	}
 	
-	public Node invert(Node n) {
-		if(n != null && (n.left != null || n.right != null)) {
-			invert(n.left);
-			Node tmp = n.left;
+	public void invert(Node n) {
+		if(n != null) {
+			Node t = n.left;
 			n.left = n.right;
-			n.right = tmp;
+			n.right = t;
+			invert(n.left);
 			invert(n.right);
 		}
-		return n;
 	}
 	
 	public int getKthLargest(int k) {
@@ -652,8 +714,9 @@ public class TestTree {
 		tt.insertNode(tt.root, 3);
 		tt.insertNode(tt.root, 36);
 		tt.insertNode(tt.root, 31);
+		tt.insertNode(tt.root, 29);
+		tt.insertNode(tt.root, 34);
 		// tt.inOrderPrint(tt.root);
-		tt.printBFSWithQueue();
 		tt.printBFSZigZag();
 		tt.printBFSReverseIterative();
 
@@ -691,24 +754,35 @@ public class TestTree {
 		ttt.insertNode(ttt.root, 4);
 		ttt.insertNode(ttt.root, 16);
 		ttt.insertNode(ttt.root, 13);
-/*		ttt.insertNode(ttt.root, 19);*/
+		ttt.insertNode(ttt.root, 32);
+		ttt.insertNode(ttt.root, 35);
+		ttt.insertNode(ttt.root, 38);
+		ttt.insertNode(ttt.root, 39);
+		ttt.insertNode(ttt.root, 40);
 		ttt.delete(ttt.root, 151);
+		ttt.prettyPrintSO();
 		ttt.iterativePreOrder();
-		int kth = ttt.getKthLargest(3);
+		ttt.preOrderPrint(ttt.root);
+		int kth = ttt.getKthLargest(4);
 		System.out.println("kth largest "+kth);
 		
 		TestTree at = new TestTree();
-		at.sortInsert(new int[]{1, 2, 3,4, 5,6,7}, 0, 6);
+		at.sortInsert(new int[]{1,2,3,4,8}, 0, 4);
 		//at.root.right.right = new Node(6);
 		System.out.println(at.isBST(at.root));
 		System.out.println("is balanced "+at.isBalanced(at.root));
 		at.printBFSIterativePretty();
-		at.invert(at.root);
-		at.printBFSIterativePretty();
+		//at.invert(at.root);
+		//at.printBFSIterativePretty();
 		
 		TestTree fromInorder = new TestTree();
 		fromInorder.createTreeFromInorderArray();
 		//fromInorder.printBFSIterativePretty();
+		at.printBFSWithQueueSimple();
+		at.printBFSZigWithQueueSimple();
+		at.printBFSReverseQueue(at.root);
+		System.out.println("isBal "+ttt.isBalanced(ttt.root));
+		at.iterativePostOrder();
 
 	}
 

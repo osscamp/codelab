@@ -123,7 +123,7 @@ public class LeetC {
     }
     
     public static void longestPalindromeSubstring() {
-    	String s = "cabcbabcbabcba";
+    	String s = "cabcbabcbrabcba";
     	int im = 0;
     	int jm = 0;
     	char[] a = s.toCharArray();
@@ -524,26 +524,23 @@ public class LeetC {
     
     public static int strStr(String haystack, String needle) {
         if(haystack == null || needle == null) return -1;
-        if(needle.length() == 0 && haystack.length() == 0) return 0;     
-        if(needle.length() == 0) return 0;
-        int ret = -1;
-        char[] ch = haystack.toCharArray();
-        char[] pch = needle.toCharArray();
-        char p0 = pch[0];
-        for(int i=0; i<ch.length; i++) {
-            if(ch[i] == p0) {
-                int j = 1;
-                int ctr = i+1;
-                while(ctr < ch.length && j<pch.length && ch[ctr] == pch[j]) {
-                    ctr++;
-                    j++;
-                }
-                if(j == pch.length) {
-                    return i;
+        int T = haystack.length();
+        int P = needle.length();
+        for(int i=0; i<=T-P; i++) {
+            int j;
+            for(j = 0; j<P; j++) {
+                char t = haystack.charAt(i+j);
+                char p = needle.charAt(j);
+                if(t != p) {
+                    j = 0;
+                    break;
                 }
             }
+            if(j == P) {
+                return i;
+            }
         }
-        return ret;
+        return -1;  
     }
     
     public static void rotatedSorted() {
@@ -581,8 +578,8 @@ public class LeetC {
 	
 	public static void main(String[] args) {
 		System.out.println(hammingWeight(8));
-		System.out.println("longest sub "+lengthOfLongestSubstringNonRepeatingCharON("rbmbibybvbsbtbvbibyb"));
-		System.out.println("longest sub - "+lengthOfLongestSubstringNonRepeatingChar("rbmbibybvbsbtbvbibyb"));
+		System.out.println("longest sub "+lengthOfLongestSubstringNonRepeatingCharON("rbmbibybvbsbwttbvribgdyb"));
+		//System.out.println("longest sub - "+lengthOfLongestSubstringNonRepeatingChar("rbmbibybvbsbtbvbibyb"));
 		longestPalindromeSubstring();
 		sort2D();
 		System.out.println(reverse(1463847412));
@@ -598,7 +595,7 @@ public class LeetC {
 		removeDuplicates(new int[]{1,2,9});
 		sortColors();
 		deleteElementFromArray();
-		System.out.println("index "+strStr(" ", ""));
+		System.out.println("index "+strStr("rbmbibybvbsbwttbvribgdyb ", "dyb"));
 		
 		LeetC t1 = new LeetC();
 		t1.root = new Node(1);

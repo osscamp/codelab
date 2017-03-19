@@ -6,7 +6,7 @@ import java.util.Map;
 public class Cracking {
 	
 	static char[][] board = {
-		{'x','o','x','x'},
+		{'x','o','x','o'},
 		{'o','x','o','x'},
 		{'x','o','o','x'},
 		{'o','x','o','x'},

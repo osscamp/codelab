@@ -329,7 +329,8 @@ public class PrincetonArray {
 	
 	public static void sudokuVerify() {
 		int N = 9;
-		int[][] s = new int[][] {{5 ,3 ,4 ,6 ,7 ,8 ,9 ,1 ,2},
+		int[][] s = new int[][] {
+				{5 ,3 ,4 ,6 ,7 ,8 ,9 ,1 ,2},
 				{6 ,7 ,2 ,1 ,9 ,5 ,3 ,4 ,8},
 				{1 ,9 ,8  ,3 ,4 ,2 ,5 ,6 ,7},
 				{8 ,5 ,9  ,7 ,6 ,1  ,4 ,2 ,3},
@@ -454,7 +455,41 @@ public class PrincetonArray {
 
 		}
 	}
-		
+	
+	//a2+b2 = c2+d2
+	public static void pairSum() {
+		int SZ = 100;
+		long[] powArray = new long[SZ];
+		for(int i = 0; i< SZ; i++){
+			int v = i+1;
+			powArray[i] = v*v*v;
+		}
+		int countPairs = 0;
+		//MaxHeap.printArray(sq);
+		int N1 = 0, N2 = SZ-1, N3, N4;
+		while(N2 > 0) {
+			N1=0;
+			while(N2-N1 > 2) {
+				long ts = powArray[N1] + powArray[N2];
+				N3 = N1+1; N4 = N2-1;
+				while(N4 > N3) {
+					if(powArray[N4]+powArray[N3] < ts) {
+						N3++;
+					}else if(powArray[N4]+powArray[N3] > ts) {
+						N4--;
+					}else{
+						//System.out.println((N1+1)+" "+(N2+1)+" "+(N3+1)+" "+(N4+1)+" CUBE "+ts);
+						countPairs++;
+						break;
+					}
+				}
+				N1++;
+			}
+			N2--;
+		}
+		System.out.println("quadruplet pair count:"+countPairs);
+	}
+	
 	public static void main(String[] args) {
 		copyArrayDriver();
 		transposeArray();
@@ -471,6 +506,7 @@ public class PrincetonArray {
 		sudokuVerify();
 		primeSieve(350);
 		printSpiral();
+		pairSum();
 	}
 
 }

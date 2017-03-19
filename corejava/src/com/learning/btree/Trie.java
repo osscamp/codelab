@@ -95,6 +95,22 @@ public class Trie {
 		}
 	}
 	
+	public void longestPrefix(String s) {
+		TrieNode t = root;
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<s.length(); i++) {
+			char cc = s.charAt(i);
+			TrieNode tt = t.children.get(cc);
+			if(tt != null) {
+				sb.append(cc);
+				t = tt;
+			}else{
+				break;
+			}
+		}
+		System.out.println(sb);
+	}
+	
 	public static void main(String[] args) throws Exception{
 		Trie trie = new Trie();
 		trie.insert("dream");
@@ -104,32 +120,39 @@ public class Trie {
 		System.out.println("is found "+trie.search("art"));
 		//trie.getWords("d");
 		trie.autocompleteSite();
+		
+
 	}
 	
 	public void autocompleteSite() throws Exception {
 		Trie tn = new Trie();
-		String url = "http://www.ebay.com/gds/Big-City-Dog-Tips-by-Justin-Silver-/10000000189742252/g.html";
+		String url = "https://www.gutenberg.org/files/98/98-h/98-h.htm";
 		URL website = new URL(url);
 		URLConnection connection = website.openConnection();
 		connection.setReadTimeout(10000);
         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(
                                     connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
         String inputLine;
 
+        int totalWords = 0;
         while ((inputLine = in.readLine()) != null) {
         	String[] strings = inputLine.split("[^a-zA-Z0-9']+");
         	for(String s : strings) {
         		s = s.toLowerCase();
+        		totalWords++;
         		tn.insert(s);
         		//System.out.println(s);
         	}
-            response.append(inputLine);
         }
         in.close();
+        System.out.println("words indexed "+totalWords);
         //System.out.println(tn.root);
-        tn.getWords("con");
+        long st = System.nanoTime();
+        tn.getWords("water");
+        long et = System.nanoTime();
+        System.out.println("micro sec "+(et-st)/Math.pow(10, 3));
+        //tn.longestPrefix("driver");
         
 	}
 

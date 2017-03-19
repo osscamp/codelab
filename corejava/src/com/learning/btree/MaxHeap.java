@@ -49,13 +49,32 @@ public class MaxHeap {
 	public static void printArray(int[] a) {
 		StringBuilder sb = new StringBuilder();
 		for(int i: a) {
-			sb.append(i).append(" ");
+			sb.append(i).append(",");
+		}
+		System.out.println(sb);
+	}
+	
+	public static void printArray(char[] a) {
+		StringBuilder sb = new StringBuilder();
+		for(char i: a) {
+			sb.append(i).append(",");
+		}
+		System.out.println(sb);
+	}
+	
+	public static void printArray(int[][] a) {
+		StringBuilder sb = new StringBuilder();
+		for(int[] a1: a) {
+			for(int i:a1) {
+				sb.append(i).append(" ");
+			}
+			sb.append("\n");
 		}
 		System.out.println(sb);
 	}
 	
 	public static void main(String[] args) {
-		int[] arr = {12,20,15,29,23,17,22,35,40,26,51,19};
+		int[] arr = {2,4,1,5,3,8};
 		//buildMaxHeap(arr);
 		heapsort(arr);
 	}

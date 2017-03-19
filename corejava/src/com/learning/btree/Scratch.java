@@ -159,6 +159,45 @@ public class Scratch {
 		}
 	}
 	
+	public static void reduce() {
+		String s = "aaaaabbbccdbbaae";
+		StringBuilder sb = new StringBuilder();
+		char prev = ' ';
+		int count = 0;
+		for(int i=0; i<s.length(); i++){
+			char c = s.charAt(i);
+			if(c == prev) {
+				count++;
+			}else{
+				if(count % 2 != 0) {
+					sb.append(prev);
+				}
+				count = 1;
+			}
+			
+			prev = c;
+		}
+		if(count % 2 != 0) {
+			sb.append(prev);
+		}
+		System.out.println(sb);
+	}
+	
+	public static void cmelCaseCount(){
+		String s = "saveChangesInTheEditor";
+		if(s == null || s.length() == 0) {System.out.println("wc "+0);return;}
+		int wc = 1;
+		char prev = ' ';
+		for(int i=0; i<s.length(); i++){
+			char c = s.charAt(i);
+			if(Character.isLowerCase(prev) && Character.isUpperCase(c)){
+				wc++;
+			}
+			prev = c;
+		}
+		System.out.println("wc "+wc);
+	}
+	
 	public static void main(String[] args) {
 		maxProfit();
 		rotateArray();
@@ -166,6 +205,9 @@ public class Scratch {
 		findOverlap();
 		printallcombsinorder();
 		printZig();
+		//red();
+		reduce();
+		cmelCaseCount();
 	}
 
 }

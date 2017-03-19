@@ -78,7 +78,7 @@ public class WebCrawler{
 						}
 						node.children.put(child.baseUrl, child);
 					}
-					text.append(data);
+					//text.append(data);
 					text.append("\n");
 					
 				}
@@ -140,7 +140,7 @@ public class WebCrawler{
 		}
 		for(Future<PageNode> f : futures) {
 			PageNode pn = f.get();
-			System.out.println("child object of future"+pn.baseUrl);
+			System.out.println(pn.baseUrl);
 		}
 		service.shutdown();
 		crawler.root.print(new StringBuilder(), crawler.root);
